@@ -133,7 +133,6 @@
   .mini-btn:hover{background:#3c2790;}
   .mini-btn.ghost{background:#ece9fa;color:var(--deep);}
   .mini-btn.ghost:hover{background:#ddd8f6;}
-  .field input[type=range]{width:100%;padding:0;border:none;accent-color:#6c3fd6;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .actions{display:flex;gap:10px;margin-top:8px;}
   .btn{
@@ -186,13 +185,16 @@
     line-height:.95;letter-spacing:-3px;white-space:nowrap;
   }
   .school-logo{
-    margin-top:56px;min-height:230px;display:flex;align-items:center;
+    margin-top:56px;width:480px;height:200px;
+    display:flex;align-items:center;justify-content:flex-start;
     position:relative;z-index:2;
   }
-  .school-logo img{max-height:230px;max-width:700px;}
+  .school-logo img{max-width:100%;max-height:100%;}
   .school-logo .ph{
+    width:100%;height:100%;
+    display:flex;align-items:center;justify-content:center;
     border:2px dashed #c9cce0;border-radius:12px;
-    padding:62px 78px;color:#aab;font-size:25px;font-weight:600;
+    color:#aab;font-size:25px;font-weight:600;
     font-family:'Noto Sans SC',sans-serif;
   }
 
@@ -280,7 +282,7 @@
           <input type="file" id="logoInput" accept="image/*">
         </label>
       </div>
-      <div class="tip">建議使用透明背景 PNG。裁切固定 16:9 比例，建議原圖至少 1280×720 px，過小會被放大而模糊。</div>
+      <div class="tip">建議使用透明背景 PNG。可自由裁切；裁好的 LOGO 會自動置入固定框，各張邀請函位置一致。原圖過小放大會模糊。</div>
       <div class="crop-wrap" id="cropWrap" style="display:none;">
         <div class="crop-stage" id="cropStage">
           <img id="cropImg" alt="">
@@ -292,13 +294,8 @@
           <button type="button" class="mini-btn" id="cropApply">套用裁切</button>
           <button type="button" class="mini-btn ghost" id="cropReset">使用整張圖</button>
         </div>
-        <div class="tip">拖曳紫色方框可移動，拉右下角圓點縮放（固定 16:9 比例）。</div>
+        <div class="tip">拖曳紫色方框可移動，拉右下角圓點自由縮放裁切範圍。</div>
       </div>
-    </div>
-
-    <div class="field" id="sizeField" style="display:none;">
-      <label>LOGO 顯示大小</label>
-      <input type="range" id="logoSize" min="80" max="300" value="170">
     </div>
 
     <div class="field">
@@ -558,7 +555,7 @@ Please apply the official virtual background. See the attachment for the Voov Me
     // logo
     var pv = $('pvLogo');
     if(logoData){
-      pv.innerHTML = '<img src="'+logoData+'" alt="logo" style="max-height:'+$('logoSize').value+'px;">';
+      pv.innerHTML = '<img src="'+logoData+'" alt="logo">';
     }else{
       pv.innerHTML = '<div class="ph">學校 / 機構 LOGO</div>';
     }
@@ -588,17 +585,16 @@ Please apply the official virtual background. See the attachment for the Voov Me
   }
 
   // bind inputs
-  ['speaker','topic','day','tz','sdate','stime','mplat','mid','tdate','ttime','tid','notes','footer','logoSize']
+  ['speaker','topic','day','tz','sdate','stime','mplat','mid','tdate','ttime','tid','notes','footer']
     .forEach(function(id){
       var el = $(id);
       el.addEventListener('input', render);
       el.addEventListener('change', render);
     });
 
-  // ---- logo upload + crop (fixed 16:9) ----
+  // ---- logo upload + crop (free ratio) ----
   var srcImage = null;
   var origDataUrl = null;
-  var CROP_AR = 16 / 9;
 
   function setLogo(data){
     logoData = data;
@@ -608,13 +604,10 @@ Please apply the official virtual background. See the attachment for the Voov Me
 
   function resetCropBox(){
     var img = $('cropImg'), box = $('cropBox');
-    var iw = img.clientWidth, ih = img.clientHeight;
-    var w = iw, h = w / CROP_AR;
-    if(h > ih){ h = ih; w = h * CROP_AR; }
-    box.style.width = w + 'px';
-    box.style.height = h + 'px';
-    box.style.left = ((iw - w) / 2) + 'px';
-    box.style.top = ((ih - h) / 2) + 'px';
+    box.style.left = '0px';
+    box.style.top = '0px';
+    box.style.width = img.clientWidth + 'px';
+    box.style.height = img.clientHeight + 'px';
   }
 
   $('logoInput').addEventListener('change', function(e){
@@ -627,7 +620,6 @@ Please apply the official virtual background. See the attachment for the Voov Me
       srcImage.onload = function(){
         $('cropImg').src = origDataUrl;
         $('cropWrap').style.display = 'block';
-        $('sizeField').style.display = 'block';
         setLogo(origDataUrl);
       };
       srcImage.src = origDataUrl;
@@ -659,10 +651,8 @@ Please apply the official virtual background. See the attachment for the Voov Me
         box.style.left = Math.min(Math.max(0, sL + dx), imgW() - sW) + 'px';
         box.style.top  = Math.min(Math.max(0, sT + dy), imgH() - sH) + 'px';
       }else{
-        var maxW = Math.min(imgW() - sL, (imgH() - sT) * CROP_AR);
-        var nw = Math.min(Math.max(48, sW + dx), maxW);
-        box.style.width  = nw + 'px';
-        box.style.height = (nw / CROP_AR) + 'px';
+        box.style.width  = Math.min(Math.max(28, sW + dx), imgW() - sL) + 'px';
+        box.style.height = Math.min(Math.max(28, sH + dy), imgH() - sT) + 'px';
       }
     }
     function end(){
