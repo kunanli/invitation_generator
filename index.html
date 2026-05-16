@@ -92,21 +92,43 @@
   }
   .field textarea{resize:vertical;min-height:64px;line-height:1.5;}
   .field .tip{font-size:11px;color:#9498ab;margin-top:4px;}
-  .logo-row{display:flex;align-items:center;gap:12px;}
-  .logo-prev{
-    width:64px;height:64px;border-radius:8px;border:1px dashed #c4c8da;
-    display:flex;align-items:center;justify-content:center;
-    background:#f4f5fa;flex:0 0 64px;overflow:hidden;
+  .logo-upload{
+    display:block;position:relative;width:100%;height:124px;
+    border:1.5px dashed #c4c8da;border-radius:10px;
+    background:#f4f5fa;cursor:pointer;overflow:hidden;
   }
-  .logo-prev img{max-width:100%;max-height:100%;}
-  .logo-prev span{font-size:10px;color:#a3a7ba;}
-  .file-btn{
-    display:inline-block;padding:8px 14px;border-radius:8px;
-    background:var(--deep);color:#fff;font-size:13px;font-weight:600;
-    cursor:pointer;
+  .logo-upload:hover{border-color:var(--purple);background:#f1eefc;}
+  .logo-upload input{display:none;}
+  .logo-upload .lu-empty{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:7px;
+    color:#9498ab;font-size:13px;font-weight:600;
   }
-  .file-btn:hover{background:#3c2790;}
-  .file-btn input{display:none;}
+  .logo-upload .lu-plus{
+    width:34px;height:34px;border-radius:50%;background:var(--deep);
+    color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;
+  }
+  .logo-upload .lu-img{
+    display:none;
+    position:absolute;inset:0;margin:auto;max-width:90%;max-height:84%;
+  }
+  .logo-upload .lu-hover{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(45,27,105,.55);color:#fff;font-size:13px;font-weight:600;
+    opacity:0;transition:opacity .15s;
+  }
+  .logo-upload.has-img .lu-empty{display:none;}
+  .logo-upload.has-img .lu-img{display:block;}
+  .logo-upload.has-img:hover .lu-hover{opacity:1;}
+  .logo-upload .lu-del{
+    display:none;position:absolute;top:7px;right:7px;z-index:2;
+    width:26px;height:26px;border:none;border-radius:50%;
+    background:rgba(45,27,105,.85);color:#fff;font-size:17px;
+    cursor:pointer;align-items:center;justify-content:center;
+    font-family:inherit;line-height:1;padding:0;
+  }
+  .logo-upload .lu-del:hover{background:#d23b3b;}
+  .logo-upload.has-img .lu-del{display:flex;}
   .crop-wrap{margin-top:10px;}
   .crop-stage{
     position:relative;display:inline-block;max-width:100%;
@@ -275,13 +297,16 @@
 
     <div class="field">
       <label>學校 / 機構 LOGO <span class="req">*</span></label>
-      <div class="logo-row">
-        <div class="logo-prev" id="logoPrev"><span>無圖片</span></div>
-        <label class="file-btn">
-          上傳圖片
-          <input type="file" id="logoInput" accept="image/*">
-        </label>
-      </div>
+      <label class="logo-upload" id="logoUpload">
+        <input type="file" id="logoInput" accept="image/*">
+        <div class="lu-empty">
+          <span class="lu-plus">+</span>
+          <span>點擊上傳學校 / 機構 LOGO</span>
+        </div>
+        <img class="lu-img" id="logoUploadImg" alt="">
+        <div class="lu-hover">點擊更換圖片</div>
+        <button type="button" class="lu-del" id="logoDelete" title="刪除圖片">&times;</button>
+      </label>
       <div class="tip">建議使用透明背景 PNG。可自由裁切；裁好的 LOGO 會自動置入固定框，各張邀請函位置一致。原圖過小放大會模糊。</div>
       <div class="crop-wrap" id="cropWrap" style="display:none;">
         <div class="crop-stage" id="cropStage">
@@ -598,7 +623,8 @@ Please apply the official virtual background. See the attachment for the Voov Me
 
   function setLogo(data){
     logoData = data;
-    $('logoPrev').innerHTML = '<img src="'+data+'" alt="">';
+    $('logoUploadImg').src = data;
+    $('logoUpload').classList.add('has-img');
     render();
   }
 
@@ -683,6 +709,19 @@ Please apply the official virtual background. See the attachment for the Voov Me
     if(!origDataUrl) return;
     resetCropBox();
     setLogo(origDataUrl);
+  });
+
+  $('logoDelete').addEventListener('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    logoData = null;
+    srcImage = null;
+    origDataUrl = null;
+    $('logoInput').value = '';
+    $('logoUploadImg').removeAttribute('src');
+    $('logoUpload').classList.remove('has-img');
+    $('cropWrap').style.display = 'none';
+    render();
   });
 
   window.addEventListener('resize', fit);
