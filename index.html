@@ -225,6 +225,7 @@
   .topic-row .val{
     color:var(--deep);font-size:30px;font-weight:500;line-height:1.32;
   }
+  .plat-link{color:inherit;text-decoration:underline;text-underline-offset:3px;}
 
   .meta{margin-top:40px;position:relative;z-index:2;}
   .meta .line{
@@ -289,7 +290,7 @@
           <input type="file" id="logoInput" accept="image/*">
         </label>
       </div>
-      <div class="tip">建議使用透明背景 PNG。裁切固定 4:3 比例，建議原圖至少 1200×900 px，過小會被放大而模糊。</div>
+      <div class="tip">建議使用透明背景 PNG。裁切固定 16:9 比例，建議原圖至少 1280×720 px，過小會被放大而模糊。</div>
       <div class="crop-wrap" id="cropWrap" style="display:none;">
         <div class="crop-stage" id="cropStage">
           <img id="cropImg" alt="">
@@ -301,7 +302,7 @@
           <button type="button" class="mini-btn" id="cropApply">套用裁切</button>
           <button type="button" class="mini-btn ghost" id="cropReset">使用整張圖</button>
         </div>
-        <div class="tip">拖曳紫色方框可移動，拉右下角圓點縮放（固定 4:3 比例）。</div>
+        <div class="tip">拖曳紫色方框可移動，拉右下角圓點縮放（固定 16:9 比例）。</div>
       </div>
     </div>
 
@@ -551,7 +552,20 @@ Please apply the official virtual background. See the attachment for the Voov Me
   function render(){
     $('pvSpeaker').textContent = $('speaker').value || ' ';
     $('pvTopic').textContent   = $('topic').value || ' ';
-    $('pvMplat').textContent   = $('mplat').value || ' ';
+    var plat = $('mplat').value || ' ';
+    var platEl = $('pvMplat');
+    platEl.innerHTML = '';
+    if(/voov/i.test(plat)){
+      var platA = document.createElement('a');
+      platA.href = 'https://voovmeeting.com/download-center.html';
+      platA.target = '_blank';
+      platA.rel = 'noopener';
+      platA.className = 'plat-link';
+      platA.textContent = plat;
+      platEl.appendChild(platA);
+    }else{
+      platEl.textContent = plat;
+    }
     $('pvDay').textContent     = $('day').value || ' ';
     $('pvMid').textContent     = $('mid').value || ' ';
     $('pvTid').textContent     = $('tid').value || '';
@@ -600,10 +614,10 @@ Please apply the official virtual background. See the attachment for the Voov Me
       el.addEventListener('change', render);
     });
 
-  // ---- logo upload + crop (fixed 4:3) ----
+  // ---- logo upload + crop (fixed 16:9) ----
   var srcImage = null;
   var origDataUrl = null;
-  var CROP_AR = 4 / 3;
+  var CROP_AR = 16 / 9;
 
   function setLogo(data){
     logoData = data;
