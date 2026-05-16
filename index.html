@@ -68,6 +68,9 @@
   }
   .field label .req{color:var(--purple);}
   .field input[type=text],
+  .field input[type=date],
+  .field input[type=time],
+  .field select,
   .field textarea{
     width:100%;
     border:1px solid #d6d9e6;
@@ -79,6 +82,9 @@
     background:#fbfbfe;
   }
   .field input[type=text]:focus,
+  .field input[type=date]:focus,
+  .field input[type=time]:focus,
+  .field select:focus,
   .field textarea:focus{
     outline:none;
     border-color:var(--purple);
@@ -206,6 +212,10 @@
   .meta .idline .fill{
     flex:1;border-bottom:1.5px solid #b9bccb;height:30px;
   }
+  .meta .tzline{
+    font-size:31px;color:#23252e;margin:6px 0 6px 42px;font-weight:400;
+  }
+  .meta .tzline.sub{color:#6f6f7e;font-size:27px;}
 
   .notes{margin-top:46px;position:relative;z-index:2;}
   .notes .nt-title{
@@ -278,47 +288,87 @@
       <textarea id="topic">From Concept to Screen: How Professional Game Artists Work at Escape Studios</textarea>
     </div>
 
-    <div class="grid2">
-      <div class="field">
-        <label>會議時間 Meeting time</label>
-        <input type="text" id="mtime" value="2026.06.26  9:00">
-      </div>
-      <div class="field">
-        <label>會議平台 Platform</label>
-        <input type="text" id="mplat" value="Voov Meeting">
+    <div class="field">
+      <label>院校所在時區 Institution Time Zone <span class="req">*</span></label>
+      <select id="tz">
+        <option value="America/Los_Angeles">美國 洛杉磯 / 太平洋時間</option>
+        <option value="America/Denver">美國 丹佛 / 山區時間</option>
+        <option value="America/Chicago">美國 芝加哥 / 中部時間</option>
+        <option value="America/New_York">美國 紐約 / 東部時間</option>
+        <option value="America/Toronto">加拿大 多倫多</option>
+        <option value="America/Vancouver">加拿大 溫哥華</option>
+        <option value="America/Sao_Paulo">巴西 聖保羅</option>
+        <option value="Europe/London" selected>英國 倫敦</option>
+        <option value="Europe/Dublin">愛爾蘭 都柏林</option>
+        <option value="Europe/Lisbon">葡萄牙 里斯本</option>
+        <option value="Europe/Paris">法國 巴黎</option>
+        <option value="Europe/Berlin">德國 柏林</option>
+        <option value="Europe/Madrid">西班牙 馬德里</option>
+        <option value="Europe/Rome">義大利 羅馬</option>
+        <option value="Europe/Amsterdam">荷蘭 阿姆斯特丹</option>
+        <option value="Europe/Stockholm">瑞典 斯德哥爾摩</option>
+        <option value="Europe/Athens">希臘 雅典</option>
+        <option value="Europe/Moscow">俄羅斯 莫斯科</option>
+        <option value="Asia/Dubai">阿聯酋 杜拜</option>
+        <option value="Asia/Kolkata">印度</option>
+        <option value="Asia/Bangkok">泰國 曼谷</option>
+        <option value="Asia/Singapore">新加坡</option>
+        <option value="Asia/Hong_Kong">香港</option>
+        <option value="Asia/Taipei">台灣</option>
+        <option value="Asia/Shanghai">中國（北京）</option>
+        <option value="Asia/Tokyo">日本 東京</option>
+        <option value="Asia/Seoul">韓國 首爾</option>
+        <option value="Australia/Perth">澳洲 伯斯</option>
+        <option value="Australia/Sydney">澳洲 雪梨</option>
+        <option value="Pacific/Auckland">紐西蘭 奧克蘭</option>
+      </select>
+      <div class="tip">下方時間以此時區輸入，會自動換算成中國時間。</div>
+    </div>
+
+    <div class="field">
+      <label>Your session time（院校當地時間）<span class="req">*</span></label>
+      <div class="grid2">
+        <input type="date" id="sdate" value="2026-06-26">
+        <input type="time" id="stime" value="09:00">
       </div>
     </div>
 
     <div class="field">
-      <label>會議 ID <span class="req">*</span></label>
+      <label>會議平台 Platform</label>
+      <input type="text" id="mplat" value="Voov Meeting">
+    </div>
+
+    <div class="field">
+      <label>Your session ID（會議號）<span class="req">*</span></label>
       <input type="text" id="mid" value="" placeholder="例如：123 456 789">
     </div>
 
-    <div class="grid2">
-      <div class="field">
-        <label>測試時間 Test Time</label>
-        <input type="text" id="ttime" value="2026.06.19  9:00">
-        <div class="tip">與演講同一時間，提前一週。</div>
+    <div class="field">
+      <label>Test session time（院校當地時間）<span class="req">*</span></label>
+      <div class="grid2">
+        <input type="date" id="tdate" value="2026-06-19">
+        <input type="time" id="ttime" value="09:00">
       </div>
-      <div class="field">
-        <label>測試會議 ID <span class="req">*</span></label>
-        <input type="text" id="tid" value="" placeholder="例如：987 654 321">
-      </div>
+      <div class="tip">與演講同一時間，提前一週。</div>
     </div>
 
     <div class="field">
-      <label>Participation Notes（每行一條） <span class="req">*</span></label>
-      <textarea id="notes" rows="8">Please join the meeting 15 minutes early and wait. Rename yourself with your real name; we will promote you to presenter when your session begins.
+      <label>Test session ID（測試會議號）<span class="req">*</span></label>
+      <input type="text" id="tid" value="" placeholder="例如：987 654 321">
+    </div>
+
+    <div class="field">
+      <label>Participation Notes（每行一條）<span class="req">*</span></label>
+      <textarea id="notes" rows="7">Please join the meeting 15 minutes early and wait. Rename yourself to your real name; we will promote you to presenter when your session begins.
 Please adhere strictly to your scheduled speaking time and reserve 15 minutes for Q&A.
-Please use the official virtual background provided.
-Ensure a stable internet connection and check your microphone and camera beforehand.
-The session will not be recorded. Please do not record, take screenshots, or distribute any content.</textarea>
+Please apply the official virtual background. See the attachment for the Voov Meeting download, installation, and registration guide and the virtual background file.
+Ensure a stable internet connection and test your microphone and camera beforehand.</textarea>
       <div class="tip">每一行會自動變成一個項目符號。</div>
     </div>
 
     <div class="field">
       <label>結尾聯絡語</label>
-      <input type="text" id="footer" value="If you have any questions, please contact the event staff. We look forward to seeing you!">
+      <input type="text" id="footer" value="Do feel free to contact us - ggaes@artdico.co; We look forward to seeing you on Summit!">
     </div>
 
     <div class="actions">
@@ -387,15 +437,19 @@ The session will not be recorded. Please do not record, take screenshots, or dis
 
           <!-- meta -->
           <div class="meta">
-            <div class="line">Meeting time：<span id="pvMtime"></span></div>
-            <div class="line">Meeting Platform：<span id="pvMplat"></span></div>
-            <div class="line idline">
-              <span>Meeting ID：</span><span id="pvMid"></span>
-            </div>
-            <div class="gap"></div>
-            <div class="line">Test Time：<span id="pvTtime"></span></div>
-            <div class="line idline">
-              <span>Test meeting ID:</span>
+            <div class="line">Your session time：</div>
+            <div class="tzline"><span id="pvSlocal"></span></div>
+            <div class="tzline sub"><span id="pvScn"></span></div>
+
+            <div class="line" style="margin-top:16px;">Meeting Platform：<span id="pvMplat"></span></div>
+            <div class="line">Your session ID：<span id="pvMid"></span></div>
+
+            <div class="line" style="margin-top:26px;">Test session time：</div>
+            <div class="tzline"><span id="pvTlocal"></span></div>
+            <div class="tzline sub"><span id="pvTcn"></span></div>
+
+            <div class="line idline" style="margin-top:16px;">
+              <span>Test session ID:</span>
               <span class="fill" id="pvTid" style="text-align:center;font-size:30px;color:#23252e;"></span>
             </div>
           </div>
@@ -419,15 +473,64 @@ The session will not be recorded. Please do not record, take screenshots, or dis
   var $ = function(id){return document.getElementById(id);};
   var logoData = null;
 
+  function tzCity(tz){ return tz.split('/').pop().replace(/_/g,' '); }
+
+  // wall-clock parts of an instant, as seen in a given time zone
+  function getParts(instant, tz){
+    var dtf = new Intl.DateTimeFormat('en-US',{
+      timeZone:tz, hourCycle:'h23',
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+    var o = {};
+    dtf.formatToParts(instant).forEach(function(p){
+      if(p.type!=='literal') o[p.type]=p.value;
+    });
+    return o;
+  }
+
+  // a local wall time in zone tz -> the matching UTC instant
+  function wallToInstant(y,mo,d,h,mi,tz){
+    var guess = Date.UTC(y,mo-1,d,h,mi,0);
+    var p = getParts(new Date(guess), tz);
+    var asUtc = Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second);
+    return new Date(guess - (asUtc - guess));
+  }
+
+  function offsetLabel(instant, tz){
+    try{
+      var dtf = new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'shortOffset'});
+      var hit = dtf.formatToParts(instant).filter(function(p){return p.type==='timeZoneName';});
+      return hit.length ? hit[0].value.replace('GMT','UTC') : '';
+    }catch(e){ return ''; }
+  }
+
+  function fmtDateTime(instant, tz){
+    var p = getParts(instant, tz);
+    var hh = p.hour==='24' ? '00' : p.hour;
+    return p.year+'.'+p.month+'.'+p.day+'  '+hh+':'+p.minute;
+  }
+
+  function renderSession(dateId,timeId,localEl,cnEl){
+    var dv=$(dateId).value, tv=$(timeId).value, tz=$('tz').value;
+    if(!dv||!tv){ $(localEl).textContent=''; $(cnEl).textContent=''; return; }
+    var dp=dv.split('-'), tp=tv.split(':');
+    var inst=wallToInstant(+dp[0],+dp[1],+dp[2],+tp[0],+tp[1],tz);
+    var off=offsetLabel(inst,tz);
+    $(localEl).textContent = fmtDateTime(inst,tz)+'   '+tzCity(tz)+' Time'+(off?' ('+off+')':'');
+    $(cnEl).textContent = fmtDateTime(inst,'Asia/Shanghai')+'   China Standard Time (UTC+8)';
+  }
+
   function render(){
     $('pvSpeaker').textContent = $('speaker').value || ' ';
     $('pvTopic').textContent   = $('topic').value || ' ';
-    $('pvMtime').textContent   = $('mtime').value || ' ';
     $('pvMplat').textContent   = $('mplat').value || ' ';
     $('pvMid').textContent     = $('mid').value || ' ';
-    $('pvTtime').textContent   = $('ttime').value || ' ';
     $('pvTid').textContent     = $('tid').value || '';
     $('pvFooter').textContent  = $('footer').value || '';
+
+    renderSession('sdate','stime','pvSlocal','pvScn');
+    renderSession('tdate','ttime','pvTlocal','pvTcn');
 
     // logo
     var pv = $('pvLogo');
@@ -462,8 +565,12 @@ The session will not be recorded. Please do not record, take screenshots, or dis
   }
 
   // bind inputs
-  ['speaker','topic','mtime','mplat','mid','ttime','tid','notes','footer']
-    .forEach(function(id){ $(id).addEventListener('input', render); });
+  ['speaker','topic','tz','sdate','stime','mplat','mid','tdate','ttime','tid','notes','footer']
+    .forEach(function(id){
+      var el = $(id);
+      el.addEventListener('input', render);
+      el.addEventListener('change', render);
+    });
 
   // logo upload
   $('logoInput').addEventListener('change', function(e){
