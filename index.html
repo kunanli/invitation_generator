@@ -212,11 +212,12 @@
     line-height:1.05;
     border-bottom:2px solid #d9d9e2;
     padding-bottom:14px;max-width:780px;
+    position:relative;z-index:2;
   }
 
   .topic-row{
     margin-top:22px;display:flex;gap:14px;align-items:baseline;
-    max-width:760px;
+    max-width:760px;position:relative;z-index:2;
   }
   .topic-row .lbl{
     color:var(--purple);font-size:30px;font-weight:600;white-space:nowrap;
@@ -230,10 +231,6 @@
     font-size:33px;color:#23252e;margin-bottom:14px;font-weight:400;
   }
   .meta .gap{height:24px;}
-  .meta .idline{display:flex;align-items:flex-end;gap:10px;max-width:900px;}
-  .meta .idline .fill{
-    flex:1;border-bottom:1.5px solid #b9bccb;height:30px;
-  }
   .meta .tzline{
     font-size:31px;color:#23252e;margin:6px 0 6px 42px;font-weight:400;
   }
@@ -255,11 +252,6 @@
   .footer-line{
     margin-top:58px;color:var(--accent);font-size:23px;font-weight:500;
     position:relative;z-index:2;
-  }
-
-  .deco{
-    position:absolute;right:0;top:560px;width:250px;height:1280px;
-    z-index:0;pointer-events:none;
   }
 
   /* ---------- Responsive ---------- */
@@ -297,7 +289,7 @@
           <input type="file" id="logoInput" accept="image/*">
         </label>
       </div>
-      <div class="tip">建議使用透明背景 PNG。上傳後可裁切並調整顯示大小。</div>
+      <div class="tip">建議使用透明背景 PNG。裁切固定 4:3 比例，建議原圖至少 1200×900 px，過小會被放大而模糊。</div>
       <div class="crop-wrap" id="cropWrap" style="display:none;">
         <div class="crop-stage" id="cropStage">
           <img id="cropImg" alt="">
@@ -309,7 +301,7 @@
           <button type="button" class="mini-btn" id="cropApply">套用裁切</button>
           <button type="button" class="mini-btn ghost" id="cropReset">使用整張圖</button>
         </div>
-        <div class="tip">拖曳紫色方框可移動，拉右下角圓點可縮放裁切範圍。</div>
+        <div class="tip">拖曳紫色方框可移動，拉右下角圓點縮放（固定 4:3 比例）。</div>
       </div>
     </div>
 
@@ -326,6 +318,16 @@
     <div class="field">
       <label>講座名稱 / Presentation Topic <span class="req">*</span></label>
       <textarea id="topic">From Concept to Screen: How Professional Game Artists Work at Escape Studios</textarea>
+    </div>
+
+    <div class="field">
+      <label>場次日 Session Day <span class="req">*</span></label>
+      <select id="day">
+        <option value="Day 1">Day 1</option>
+        <option value="Day 2">Day 2</option>
+        <option value="Day 3">Day 3</option>
+      </select>
+      <div class="tip">峰會共三天，選擇講師的場次日。</div>
     </div>
 
     <div class="field">
@@ -425,19 +427,6 @@ Ensure a stable internet connection and test your microphone and camera beforeha
       <div id="scaler">
         <div class="card" id="card">
 
-          <!-- decorative shapes -->
-          <svg class="deco" viewBox="0 0 250 1280" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="155" cy="95" r="92" fill="#5b4bd6"/>
-            <path d="M250 60 A92 92 0 0 0 158 152 L250 152 Z" fill="#2d1b69"/>
-            <path d="M40 215 L250 215 L250 405 Z" fill="#2d1b69"/>
-            <rect x="78" y="430" width="172" height="172" fill="#7b6ef0"/>
-            <path d="M250 640 A150 150 0 0 0 100 790 L250 790 Z" fill="#4834b0"/>
-            <path d="M250 815 L70 815 L250 995 Z" fill="#6c5ce7"/>
-            <path d="M95 1030 A78 78 0 0 0 251 1030 Z" fill="#2d1b69"/>
-            <rect x="118" y="1075" width="132" height="132" fill="#8b7ff0"/>
-            <path d="M250 1110 L250 1240 L120 1240 Z" fill="#4834b0"/>
-          </svg>
-
           <!-- header -->
           <div class="summit-header">
             <div class="summit-mark">
@@ -473,24 +462,25 @@ Ensure a stable internet connection and test your microphone and camera beforeha
             <div class="lbl">Presentation Topic：</div>
             <div class="val" id="pvTopic"></div>
           </div>
+          <div class="topic-row" style="margin-top:14px;">
+            <div class="lbl">Meeting Platform：</div>
+            <div class="val" id="pvMplat"></div>
+          </div>
 
           <!-- meta -->
           <div class="meta">
-            <div class="line">Your session time：</div>
+            <div class="line">Session day：<span id="pvDay"></span></div>
+            <div class="line" style="margin-top:14px;">Your session time：</div>
             <div class="tzline"><span id="pvSlocal"></span></div>
             <div class="tzline sub"><span id="pvScn"></span></div>
 
-            <div class="line" style="margin-top:16px;">Meeting Platform：<span id="pvMplat"></span></div>
-            <div class="line">Your session ID：<span id="pvMid"></span></div>
+            <div class="line" style="margin-top:14px;">Your session ID：<span id="pvMid"></span></div>
 
             <div class="line" style="margin-top:26px;">Test session time：</div>
             <div class="tzline"><span id="pvTlocal"></span></div>
             <div class="tzline sub"><span id="pvTcn"></span></div>
 
-            <div class="line idline" style="margin-top:16px;">
-              <span>Test session ID:</span>
-              <span class="fill" id="pvTid" style="text-align:center;font-size:30px;color:#23252e;"></span>
-            </div>
+            <div class="line" style="margin-top:14px;">Test session ID：<span id="pvTid"></span></div>
           </div>
 
           <!-- notes -->
@@ -564,6 +554,7 @@ Ensure a stable internet connection and test your microphone and camera beforeha
     $('pvSpeaker').textContent = $('speaker').value || ' ';
     $('pvTopic').textContent   = $('topic').value || ' ';
     $('pvMplat').textContent   = $('mplat').value || ' ';
+    $('pvDay').textContent     = $('day').value || ' ';
     $('pvMid').textContent     = $('mid').value || ' ';
     $('pvTid').textContent     = $('tid').value || '';
     $('pvFooter').textContent  = $('footer').value || '';
@@ -604,16 +595,17 @@ Ensure a stable internet connection and test your microphone and camera beforeha
   }
 
   // bind inputs
-  ['speaker','topic','tz','sdate','stime','mplat','mid','tdate','ttime','tid','notes','footer','logoSize']
+  ['speaker','topic','day','tz','sdate','stime','mplat','mid','tdate','ttime','tid','notes','footer','logoSize']
     .forEach(function(id){
       var el = $(id);
       el.addEventListener('input', render);
       el.addEventListener('change', render);
     });
 
-  // ---- logo upload + crop ----
+  // ---- logo upload + crop (fixed 4:3) ----
   var srcImage = null;
   var origDataUrl = null;
+  var CROP_AR = 4 / 3;
 
   function setLogo(data){
     logoData = data;
@@ -623,10 +615,13 @@ Ensure a stable internet connection and test your microphone and camera beforeha
 
   function resetCropBox(){
     var img = $('cropImg'), box = $('cropBox');
-    box.style.left = '0px';
-    box.style.top = '0px';
-    box.style.width = img.clientWidth + 'px';
-    box.style.height = img.clientHeight + 'px';
+    var iw = img.clientWidth, ih = img.clientHeight;
+    var w = iw, h = w / CROP_AR;
+    if(h > ih){ h = ih; w = h * CROP_AR; }
+    box.style.width = w + 'px';
+    box.style.height = h + 'px';
+    box.style.left = ((iw - w) / 2) + 'px';
+    box.style.top = ((ih - h) / 2) + 'px';
   }
 
   $('logoInput').addEventListener('change', function(e){
@@ -671,8 +666,10 @@ Ensure a stable internet connection and test your microphone and camera beforeha
         box.style.left = Math.min(Math.max(0, sL + dx), imgW() - sW) + 'px';
         box.style.top  = Math.min(Math.max(0, sT + dy), imgH() - sH) + 'px';
       }else{
-        box.style.width  = Math.min(Math.max(28, sW + dx), imgW() - sL) + 'px';
-        box.style.height = Math.min(Math.max(28, sH + dy), imgH() - sT) + 'px';
+        var maxW = Math.min(imgW() - sL, (imgH() - sT) * CROP_AR);
+        var nw = Math.min(Math.max(48, sW + dx), maxW);
+        box.style.width  = nw + 'px';
+        box.style.height = (nw / CROP_AR) + 'px';
       }
     }
     function end(){
