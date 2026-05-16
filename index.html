@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>邀請函生成器 · Invitation Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --purple:#6c3fd6;
+    --deep:#2d1b69;
+    --navy:#16113a;
+    --ink:#2b2b2b;
+    --accent:#6c5ce7;
+    --c-dark:#2d1b69;
+    --c-mid:#4834b0;
+    --c-purple:#6c5ce7;
+    --c-light:#8b7ff0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Poppins','Noto Sans SC',sans-serif;
+    background:#eef0f6;
+    color:#1f2333;
+  }
+  .app{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+    padding:28px;
+    max-width:1680px;
+    margin:0 auto;
+  }
+
+  /* ---------- Form panel ---------- */
+  .form-col{
+    flex:0 0 420px;
+    background:#fff;
+    border-radius:16px;
+    padding:24px;
+    box-shadow:0 8px 30px rgba(30,20,80,.08);
+    position:sticky;
+    top:28px;
+    max-height:calc(100vh - 56px);
+    overflow:auto;
+  }
+  .form-col h1{
+    font-size:22px;
+    margin:0 0 4px;
+    color:var(--deep);
+  }
+  .form-col .sub{
+    font-size:13px;
+    color:#7a7e93;
+    margin:0 0 18px;
+  }
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:6px;
+    color:#3a3f57;
+  }
+  .field label .req{color:var(--purple);}
+  .field input[type=text],
+  .field textarea{
+    width:100%;
+    border:1px solid #d6d9e6;
+    border-radius:9px;
+    padding:9px 11px;
+    font-size:14px;
+    font-family:inherit;
+    color:#1f2333;
+    background:#fbfbfe;
+  }
+  .field input[type=text]:focus,
+  .field textarea:focus{
+    outline:none;
+    border-color:var(--purple);
+    background:#fff;
+  }
+  .field textarea{resize:vertical;min-height:64px;line-height:1.5;}
+  .field .tip{font-size:11px;color:#9498ab;margin-top:4px;}
+  .logo-row{display:flex;align-items:center;gap:12px;}
+  .logo-prev{
+    width:64px;height:64px;border-radius:8px;border:1px dashed #c4c8da;
+    display:flex;align-items:center;justify-content:center;
+    background:#f4f5fa;flex:0 0 64px;overflow:hidden;
+  }
+  .logo-prev img{max-width:100%;max-height:100%;}
+  .logo-prev span{font-size:10px;color:#a3a7ba;}
+  .file-btn{
+    display:inline-block;padding:8px 14px;border-radius:8px;
+    background:var(--deep);color:#fff;font-size:13px;font-weight:600;
+    cursor:pointer;
+  }
+  .file-btn:hover{background:#3c2790;}
+  .file-btn input{display:none;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .actions{display:flex;gap:10px;margin-top:8px;}
+  .btn{
+    flex:1;border:none;border-radius:10px;padding:12px;
+    font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-primary{background:var(--purple);color:#fff;}
+  .btn-primary:hover{background:#5a31bd;}
+  .btn-ghost{background:#ece9fa;color:var(--deep);}
+  .btn-ghost:hover{background:#ddd8f6;}
+  .btn:disabled{opacity:.6;cursor:wait;}
+  .hint{font-size:11px;color:#9498ab;margin-top:10px;line-height:1.5;}
+
+  /* ---------- Preview ---------- */
+  .preview-col{flex:1;min-width:0;}
+  .preview-col .panel-title{
+    font-size:14px;color:#7a7e93;margin:0 0 12px;font-weight:600;
+  }
+  #previewBox{
+    overflow:hidden;
+    border-radius:14px;
+    box-shadow:0 12px 40px rgba(30,20,80,.16);
+    background:#fff;
+  }
+  #scaler{transform-origin:top left;width:1080px;}
+
+  /* ---------- The card ---------- */
+  .card{
+    width:1080px;
+    background:#fff;
+    position:relative;
+    padding:72px 72px 56px;
+    overflow:hidden;
+    font-family:'Poppins','Noto Sans SC',sans-serif;
+  }
+
+  .summit-header{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    gap:30px;
+  }
+  .summit-mark{display:flex;align-items:flex-start;gap:14px;}
+  .summit-mark svg{flex:0 0 auto;}
+  .summit-mark .txt{padding-top:30px;}
+  .summit-mark .txt .cn{
+    font-family:'Noto Sans SC',sans-serif;
+    font-weight:900;font-size:21px;color:#16113a;line-height:1.2;
+  }
+  .summit-mark .txt .en{
+    font-size:11px;color:#3a3550;font-weight:600;line-height:1.25;
+    margin-top:4px;max-width:170px;
+  }
+  .summit-title{
+    text-align:right;font-weight:800;font-size:39px;color:var(--navy);
+    line-height:1.16;max-width:470px;
+  }
+
+  .invite-block{margin-top:26px;}
+  .invite-title{
+    font-size:182px;font-weight:800;color:var(--deep);
+    line-height:.95;letter-spacing:-3px;white-space:nowrap;
+  }
+  .invite-sub{
+    font-family:'Noto Sans SC',sans-serif;
+    font-size:64px;font-weight:700;color:var(--deep);
+    margin-top:6px;line-height:1;
+  }
+
+  .school-logo{
+    margin-top:48px;min-height:96px;display:flex;align-items:center;
+  }
+  .school-logo img{max-height:120px;max-width:520px;}
+  .school-logo .ph{
+    border:2px dashed #c9cce0;border-radius:10px;
+    padding:22px 36px;color:#aab;font-size:18px;font-weight:600;
+    font-family:'Noto Sans SC',sans-serif;
+  }
+
+  .speaker{
+    margin-top:30px;
+    font-size:70px;font-weight:800;color:var(--purple);
+    line-height:1.05;
+    border-bottom:2px solid #d9d9e2;
+    padding-bottom:14px;max-width:780px;
+  }
+
+  .topic-row{
+    margin-top:22px;display:flex;gap:14px;align-items:baseline;
+    max-width:760px;
+  }
+  .topic-row .lbl{
+    color:var(--purple);font-size:30px;font-weight:600;white-space:nowrap;
+  }
+  .topic-row .val{
+    color:var(--deep);font-size:30px;font-weight:500;line-height:1.32;
+  }
+
+  .meta{margin-top:40px;max-width:660px;position:relative;z-index:2;}
+  .meta .line{
+    font-size:33px;color:#23252e;margin-bottom:14px;font-weight:400;
+  }
+  .meta .gap{height:24px;}
+  .meta .idline{display:flex;align-items:flex-end;gap:10px;max-width:900px;}
+  .meta .idline .fill{
+    flex:1;border-bottom:1.5px solid #b9bccb;height:30px;
+  }
+
+  .notes{margin-top:46px;position:relative;z-index:2;}
+  .notes .nt-title{
+    color:var(--purple);font-size:25px;font-weight:600;margin-bottom:16px;
+  }
+  .notes ul{margin:0;padding:0;list-style:none;}
+  .notes li{
+    position:relative;padding-left:30px;margin-bottom:16px;
+    font-size:24px;color:#3a3a44;line-height:1.4;max-width:840px;
+  }
+  .notes li::before{
+    content:"";position:absolute;left:6px;top:11px;
+    width:8px;height:8px;border-radius:50%;background:#3a3a44;
+  }
+  .footer-line{
+    margin-top:24px;color:var(--accent);font-size:23px;font-weight:500;
+    position:relative;z-index:2;
+  }
+
+  .deco{
+    position:absolute;right:0;top:560px;width:250px;height:1280px;
+    z-index:0;pointer-events:none;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:1100px){
+    .app{flex-direction:column;}
+    .form-col{position:static;flex:1 1 auto;width:100%;max-height:none;}
+  }
+
+  /* ---------- Print / PDF ---------- */
+  @media print{
+    @page{size:285mm 489mm;margin:0;}
+    body{background:#fff;}
+    .form-col,.preview-col .panel-title,.app{gap:0;padding:0;}
+    .form-col{display:none;}
+    #previewBox{box-shadow:none;border-radius:0;overflow:visible;height:auto!important;}
+    #scaler{transform:none!important;width:1080px;}
+    .preview-col .panel-title{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ FORM ============ -->
+  <div class="form-col">
+    <h1>邀請函生成器</h1>
+    <p class="sub">填寫下列欄位，右側即時預覽。完成後可下載 JPEG 或列印成 PDF。</p>
+
+    <div class="field">
+      <label>學校 / 機構 LOGO <span class="req">*</span></label>
+      <div class="logo-row">
+        <div class="logo-prev" id="logoPrev"><span>無圖片</span></div>
+        <label class="file-btn">
+          上傳圖片
+          <input type="file" id="logoInput" accept="image/*">
+        </label>
+      </div>
+      <div class="tip">建議使用透明背景 PNG。</div>
+    </div>
+
+    <div class="field">
+      <label>講師姓名 <span class="req">*</span></label>
+      <input type="text" id="speaker" value="Niccolo Temperanza">
+    </div>
+
+    <div class="field">
+      <label>講座名稱 / Presentation Topic <span class="req">*</span></label>
+      <textarea id="topic">From Concept to Screen: How Professional Game Artists Work at Escape Studios</textarea>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>會議時間 Meeting time</label>
+        <input type="text" id="mtime" value="2026.06.26  9:00">
+      </div>
+      <div class="field">
+        <label>會議平台 Platform</label>
+        <input type="text" id="mplat" value="Voov Meeting">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>會議 ID <span class="req">*</span></label>
+      <input type="text" id="mid" value="" placeholder="例如：123 456 789">
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>測試時間 Test Time</label>
+        <input type="text" id="ttime" value="2026.06.26   8:45">
+      </div>
+      <div class="field">
+        <label>測試會議 ID <span class="req">*</span></label>
+        <input type="text" id="tid" value="" placeholder="例如：987 654 321">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Participation Notes（每行一條） <span class="req">*</span></label>
+      <textarea id="notes" rows="8">A test session (10 minutes) will be available 24 hours in advance. Please prepare and check your equipment and presentation in advance
+Please adhere strictly to your scheduled speaking time and reserve 15 minutes for Q&A.
+Please use the official virtual background provided.
+Ensure a stable internet connection and check your microphone and camera beforehand.
+The session will not be recorded. Please do not record, take screenshots, or distribute any content.</textarea>
+      <div class="tip">每一行會自動變成一個項目符號。</div>
+    </div>
+
+    <div class="field">
+      <label>結尾聯絡語</label>
+      <input type="text" id="footer" value="If you have any questions, please contact the event staff. We look forward to seeing you!">
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="dlBtn">下載 JPEG</button>
+      <button class="btn btn-ghost" id="pdfBtn">列印 / 存 PDF</button>
+    </div>
+    <div class="hint">頂部峰會標題為固定樣式，不可修改。</div>
+  </div>
+
+  <!-- ============ PREVIEW ============ -->
+  <div class="preview-col">
+    <p class="panel-title">即時預覽</p>
+    <div id="previewBox">
+      <div id="scaler">
+        <div class="card" id="card">
+
+          <!-- decorative shapes -->
+          <svg class="deco" viewBox="0 0 250 1280" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="155" cy="95" r="92" fill="#5b4bd6"/>
+            <path d="M250 60 A92 92 0 0 0 158 152 L250 152 Z" fill="#2d1b69"/>
+            <path d="M40 215 L250 215 L250 405 Z" fill="#2d1b69"/>
+            <rect x="78" y="430" width="172" height="172" fill="#7b6ef0"/>
+            <path d="M250 640 A150 150 0 0 0 100 790 L250 790 Z" fill="#4834b0"/>
+            <path d="M250 815 L70 815 L250 995 Z" fill="#6c5ce7"/>
+            <path d="M95 1030 A78 78 0 0 0 251 1030 Z" fill="#2d1b69"/>
+            <rect x="118" y="1075" width="132" height="132" fill="#8b7ff0"/>
+            <path d="M250 1110 L250 1240 L120 1240 Z" fill="#4834b0"/>
+          </svg>
+
+          <!-- header -->
+          <div class="summit-header">
+            <div class="summit-mark">
+              <svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 38 L20 82 A55 55 0 0 0 130 82 L130 38 L96 38 L96 82 A21 21 0 0 1 54 82 L54 38 Z" fill="#2d1b69"/>
+                <rect x="25" y="6" width="36" height="36" fill="#16113a"/>
+                <rect x="64" y="14" width="29" height="29" fill="#6c5ce7"/>
+                <circle cx="115" cy="28" r="18" fill="#7b6ef0"/>
+              </svg>
+              <div class="txt">
+                <div class="cn">全球留學<br>遊戲動畫峰會</div>
+                <div class="en">Global Game &amp; Animation Education Summit</div>
+              </div>
+            </div>
+            <div class="summit-title">Global Game &amp; Animation Education Summit in China 2026</div>
+          </div>
+
+          <!-- invitation -->
+          <div class="invite-block">
+            <div class="invite-title">Invitation</div>
+            <div class="invite-sub">邀請函</div>
+          </div>
+
+          <!-- school logo -->
+          <div class="school-logo" id="pvLogo">
+            <div class="ph">學校 / 機構 LOGO</div>
+          </div>
+
+          <!-- speaker -->
+          <div class="speaker" id="pvSpeaker">Niccolo Temperanza</div>
+
+          <!-- topic -->
+          <div class="topic-row">
+            <div class="lbl">Presentation Topic：</div>
+            <div class="val" id="pvTopic"></div>
+          </div>
+
+          <!-- meta -->
+          <div class="meta">
+            <div class="line">Meeting time：<span id="pvMtime"></span></div>
+            <div class="line">Meeting Platform：<span id="pvMplat"></span></div>
+            <div class="line idline">
+              <span>Meeting ID：</span><span id="pvMid"></span>
+            </div>
+            <div class="gap"></div>
+            <div class="line">Test Time：<span id="pvTtime"></span></div>
+            <div class="line idline">
+              <span>Test meeting ID:</span>
+              <span class="fill" id="pvTid" style="text-align:center;font-size:30px;color:#23252e;"></span>
+            </div>
+          </div>
+
+          <!-- notes -->
+          <div class="notes">
+            <div class="nt-title">Participation Notes:</div>
+            <ul id="pvNotes"></ul>
+          </div>
+          <div class="footer-line" id="pvFooter"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var $ = function(id){return document.getElementById(id);};
+  var logoData = null;
+
+  function render(){
+    $('pvSpeaker').textContent = $('speaker').value || ' ';
+    $('pvTopic').textContent   = $('topic').value || ' ';
+    $('pvMtime').textContent   = $('mtime').value || ' ';
+    $('pvMplat').textContent   = $('mplat').value || ' ';
+    $('pvMid').textContent     = $('mid').value || ' ';
+    $('pvTtime').textContent   = $('ttime').value || ' ';
+    $('pvTid').textContent     = $('tid').value || '';
+    $('pvFooter').textContent  = $('footer').value || '';
+
+    // logo
+    var pv = $('pvLogo');
+    if(logoData){
+      pv.innerHTML = '<img src="'+logoData+'" alt="logo">';
+    }else{
+      pv.innerHTML = '<div class="ph">學校 / 機構 LOGO</div>';
+    }
+
+    // notes
+    var lines = $('notes').value.split('\n').map(function(s){return s.trim();})
+                  .filter(function(s){return s.length;});
+    var ul = $('pvNotes');
+    ul.innerHTML = '';
+    lines.forEach(function(t){
+      var li = document.createElement('li');
+      li.textContent = t;
+      ul.appendChild(li);
+    });
+
+    fit();
+  }
+
+  function fit(){
+    var box = $('previewBox');
+    var scaler = $('scaler');
+    var card = $('card');
+    var avail = box.clientWidth;
+    var scale = Math.min(1, avail / 1080);
+    scaler.style.transform = 'scale(' + scale + ')';
+    box.style.height = (card.offsetHeight * scale) + 'px';
+  }
+
+  // bind inputs
+  ['speaker','topic','mtime','mplat','mid','ttime','tid','notes','footer']
+    .forEach(function(id){ $(id).addEventListener('input', render); });
+
+  // logo upload
+  $('logoInput').addEventListener('change', function(e){
+    var f = e.target.files[0];
+    if(!f) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      logoData = ev.target.result;
+      var lp = $('logoPrev');
+      lp.innerHTML = '<img src="'+logoData+'" alt="">';
+      render();
+    };
+    reader.readAsDataURL(f);
+  });
+
+  window.addEventListener('resize', fit);
+
+  // download JPEG
+  $('dlBtn').addEventListener('click', async function(){
+    var btn = this;
+    btn.disabled = true;
+    var label = btn.textContent;
+    btn.textContent = '產生中...';
+    try{
+      if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
+      var canvas = await html2canvas($('card'), {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false
+      });
+      var url = canvas.toDataURL('image/jpeg', 0.95);
+      var a = document.createElement('a');
+      var name = ($('speaker').value || 'invitation').replace(/[^\w一-龥-]+/g,'_');
+      a.href = url;
+      a.download = 'invitation_' + name + '.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }catch(err){
+      alert('產生圖片失敗：' + err.message);
+    }finally{
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  });
+
+  // print / PDF
+  $('pdfBtn').addEventListener('click', function(){
+    window.print();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
