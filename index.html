@@ -92,69 +92,6 @@
   }
   .field textarea{resize:vertical;min-height:64px;line-height:1.5;}
   .field .tip{font-size:11px;color:#9498ab;margin-top:4px;}
-  .logo-upload{
-    display:block;position:relative;width:100%;height:124px;
-    border:1.5px dashed #c4c8da;border-radius:10px;
-    background:#f4f5fa;cursor:pointer;overflow:hidden;
-  }
-  .logo-upload:hover{border-color:var(--purple);background:#f1eefc;}
-  .logo-upload input{display:none;}
-  .logo-upload .lu-empty{
-    position:absolute;inset:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:7px;
-    color:#9498ab;font-size:13px;font-weight:600;
-  }
-  .logo-upload .lu-plus{
-    width:34px;height:34px;border-radius:50%;background:var(--deep);
-    color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;
-  }
-  .logo-upload .lu-img{
-    display:none;
-    position:absolute;inset:0;margin:auto;max-width:90%;max-height:84%;
-  }
-  .logo-upload .lu-hover{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    background:rgba(45,27,105,.55);color:#fff;font-size:13px;font-weight:600;
-    opacity:0;transition:opacity .15s;
-  }
-  .logo-upload.has-img .lu-empty{display:none;}
-  .logo-upload.has-img .lu-img{display:block;}
-  .logo-upload.has-img:hover .lu-hover{opacity:1;}
-  .logo-upload .lu-del{
-    display:none;position:absolute;top:7px;right:7px;z-index:2;
-    width:26px;height:26px;border:none;border-radius:50%;
-    background:rgba(45,27,105,.85);color:#fff;font-size:17px;
-    cursor:pointer;align-items:center;justify-content:center;
-    font-family:inherit;line-height:1;padding:0;
-  }
-  .logo-upload .lu-del:hover{background:#d23b3b;}
-  .logo-upload.has-img .lu-del{display:flex;}
-  .crop-wrap{margin-top:10px;}
-  .crop-stage{
-    position:relative;display:inline-block;max-width:100%;
-    border:1px solid #d6d9e6;border-radius:8px;overflow:hidden;
-    background:#f4f5fa;line-height:0;user-select:none;
-  }
-  .crop-stage img{display:block;max-width:100%;max-height:300px;}
-  .crop-box{
-    position:absolute;left:0;top:0;box-sizing:border-box;
-    border:2px solid #6c3fd6;cursor:move;touch-action:none;
-    box-shadow:0 0 0 9999px rgba(0,0,0,.4);
-  }
-  .crop-handle{
-    position:absolute;right:-8px;bottom:-8px;width:16px;height:16px;
-    background:#6c3fd6;border:2px solid #fff;border-radius:50%;
-    cursor:nwse-resize;touch-action:none;
-  }
-  .crop-actions{margin-top:8px;display:flex;gap:8px;}
-  .mini-btn{
-    border:none;border-radius:7px;padding:7px 13px;font-size:12px;
-    font-weight:600;cursor:pointer;background:var(--deep);color:#fff;
-    font-family:inherit;
-  }
-  .mini-btn:hover{background:#3c2790;}
-  .mini-btn.ghost{background:#ece9fa;color:var(--deep);}
-  .mini-btn.ghost:hover{background:#ddd8f6;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .actions{display:flex;gap:10px;margin-top:8px;}
   .btn{
@@ -297,30 +234,10 @@
 
     <div class="field">
       <label>學校 / 機構 LOGO <span class="req">*</span></label>
-      <label class="logo-upload" id="logoUpload">
-        <input type="file" id="logoInput" accept="image/*">
-        <div class="lu-empty">
-          <span class="lu-plus">+</span>
-          <span>點擊上傳學校 / 機構 LOGO</span>
-        </div>
-        <img class="lu-img" id="logoUploadImg" alt="">
-        <div class="lu-hover">點擊更換圖片</div>
-        <button type="button" class="lu-del" id="logoDelete" title="刪除圖片">&times;</button>
-      </label>
-      <div class="tip">建議使用透明背景 PNG。可自由裁切；裁好的 LOGO 會自動置入固定框，各張邀請函位置一致。原圖過小放大會模糊。</div>
-      <div class="crop-wrap" id="cropWrap" style="display:none;">
-        <div class="crop-stage" id="cropStage">
-          <img id="cropImg" alt="">
-          <div class="crop-box" id="cropBox">
-            <div class="crop-handle" id="cropHandle"></div>
-          </div>
-        </div>
-        <div class="crop-actions">
-          <button type="button" class="mini-btn" id="cropApply">套用裁切</button>
-          <button type="button" class="mini-btn ghost" id="cropReset">使用整張圖</button>
-        </div>
-        <div class="tip">拖曳紫色方框可移動，拉右下角圓點自由縮放裁切範圍。</div>
-      </div>
+      <select id="logoSelect">
+        <option value="">— 選擇學校 / 機構 —</option>
+      </select>
+      <div class="tip">LOGO 已內建，選擇後自動帶入，無需上傳。</div>
     </div>
 
     <div class="field">
@@ -502,7 +419,6 @@ Please apply the official virtual background. See the attachment for the Voov Me
 <script>
 (function(){
   var $ = function(id){return document.getElementById(id);};
-  var logoData = null;
 
   function tzCity(tz){ return tz.split('/').pop().replace(/_/g,' '); }
 
@@ -579,8 +495,9 @@ Please apply the official virtual background. See the attachment for the Voov Me
 
     // logo
     var pv = $('pvLogo');
-    if(logoData){
-      pv.innerHTML = '<img src="'+logoData+'" alt="logo">';
+    var logoFile = $('logoSelect').value;
+    if(logoFile){
+      pv.innerHTML = '<img src="'+logoFile+'" alt="logo">';
     }else{
       pv.innerHTML = '<div class="ph">學校 / 機構 LOGO</div>';
     }
@@ -610,119 +527,45 @@ Please apply the official virtual background. See the attachment for the Voov Me
   }
 
   // bind inputs
-  ['speaker','topic','day','tz','sdate','stime','mplat','mid','tdate','ttime','tid','notes','footer']
+  ['logoSelect','speaker','topic','day','tz','sdate','stime','mplat','mid','tdate','ttime','tid','notes','footer']
     .forEach(function(id){
       var el = $(id);
       el.addEventListener('input', render);
       el.addEventListener('change', render);
     });
 
-  // ---- logo upload + crop (free ratio) ----
-  var srcImage = null;
-  var origDataUrl = null;
-
-  function setLogo(data){
-    logoData = data;
-    $('logoUploadImg').src = data;
-    $('logoUpload').classList.add('has-img');
-    render();
-  }
-
-  function resetCropBox(){
-    var img = $('cropImg'), box = $('cropBox');
-    box.style.left = '0px';
-    box.style.top = '0px';
-    box.style.width = img.clientWidth + 'px';
-    box.style.height = img.clientHeight + 'px';
-  }
-
-  $('logoInput').addEventListener('change', function(e){
-    var f = e.target.files[0];
-    if(!f) return;
-    var reader = new FileReader();
-    reader.onload = function(ev){
-      origDataUrl = ev.target.result;
-      srcImage = new Image();
-      srcImage.onload = function(){
-        $('cropImg').src = origDataUrl;
-        $('cropWrap').style.display = 'block';
-        setLogo(origDataUrl);
-      };
-      srcImage.src = origDataUrl;
-    };
-    reader.readAsDataURL(f);
-  });
-
-  $('cropImg').addEventListener('load', resetCropBox);
-
+  // ---- institution logo (pre-loaded) ----
+  var INSTITUTIONS = [
+    { name:'Abertay University', logo:'Abertay.webp' },
+    { name:'Bournemouth University', logo:'Bu.webp' },
+    { name:'California Institute of the Arts', logo:'Calarts.webp' },
+    { name:'DigiPen Institute of Technology', logo:'DigiPen_web_logo.webp' },
+    { name:'Escape Studios', logo:'Escape.webp' },
+    { name:'Global Game Jam', logo:'GGJ.webp' },
+    { name:'Gnomon', logo:'Gnomon.webp' },
+    { name:'Hong Kong Polytechnic University', logo:'PolyU.webp' },
+    { name:'MAGES Institute (Singapore)', logo:'MAGES.webp' },
+    { name:'Otis College of Art and Design', logo:'OTis.webp' },
+    { name:'Southern Methodist University', logo:'SMU.webp' },
+    { name:'Teesside University', logo:'Teessi.webp' },
+    { name:'Tencent Games', logo:'Tencent.webp' },
+    { name:'The Glasgow School of Art', logo:'GSA.webp' },
+    { name:'Unreal Engine', logo:'UnrealEngine.webp' },
+    { name:'University of Hertfordshire', logo:'University_of_Hertfordshire_Logo.svg.webp' },
+    { name:'University of Staffordshire', logo:'Staffordshire.webp' },
+    { name:'University of the Arts London', logo:'UAL.webp' },
+    { name:'University of Utah', logo:'Utah.webp' }
+  ];
   (function(){
-    var box = $('cropBox'), handle = $('cropHandle');
-    var mode = null, sx, sy, sL, sT, sW, sH;
-    function imgW(){ return $('cropImg').clientWidth; }
-    function imgH(){ return $('cropImg').clientHeight; }
-    function start(e, m){
-      mode = m;
-      sx = e.clientX; sy = e.clientY;
-      sL = parseFloat(box.style.left) || 0;
-      sT = parseFloat(box.style.top) || 0;
-      sW = parseFloat(box.style.width) || 0;
-      sH = parseFloat(box.style.height) || 0;
-      e.preventDefault(); e.stopPropagation();
-      window.addEventListener('pointermove', move);
-      window.addEventListener('pointerup', end);
-    }
-    function move(e){
-      var dx = e.clientX - sx, dy = e.clientY - sy;
-      if(mode === 'move'){
-        box.style.left = Math.min(Math.max(0, sL + dx), imgW() - sW) + 'px';
-        box.style.top  = Math.min(Math.max(0, sT + dy), imgH() - sH) + 'px';
-      }else{
-        box.style.width  = Math.min(Math.max(28, sW + dx), imgW() - sL) + 'px';
-        box.style.height = Math.min(Math.max(28, sH + dy), imgH() - sT) + 'px';
-      }
-    }
-    function end(){
-      mode = null;
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', end);
-    }
-    box.addEventListener('pointerdown', function(e){ start(e, 'move'); });
-    handle.addEventListener('pointerdown', function(e){ start(e, 'resize'); });
+    var logoSel = $('logoSelect');
+    INSTITUTIONS.forEach(function(it){
+      var o = document.createElement('option');
+      o.value = it.logo;
+      o.textContent = it.name;
+      logoSel.appendChild(o);
+    });
+    logoSel.value = 'Escape.webp';
   })();
-
-  $('cropApply').addEventListener('click', function(){
-    if(!srcImage) return;
-    var img = $('cropImg'), box = $('cropBox');
-    var k = srcImage.naturalWidth / img.clientWidth;
-    var cx = (parseFloat(box.style.left) || 0) * k;
-    var cy = (parseFloat(box.style.top) || 0) * k;
-    var cw = (parseFloat(box.style.width) || img.clientWidth) * k;
-    var ch = (parseFloat(box.style.height) || img.clientHeight) * k;
-    var canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(cw));
-    canvas.height = Math.max(1, Math.round(ch));
-    canvas.getContext('2d').drawImage(srcImage, cx, cy, cw, ch, 0, 0, canvas.width, canvas.height);
-    setLogo(canvas.toDataURL('image/png'));
-  });
-
-  $('cropReset').addEventListener('click', function(){
-    if(!origDataUrl) return;
-    resetCropBox();
-    setLogo(origDataUrl);
-  });
-
-  $('logoDelete').addEventListener('click', function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    logoData = null;
-    srcImage = null;
-    origDataUrl = null;
-    $('logoInput').value = '';
-    $('logoUploadImg').removeAttribute('src');
-    $('logoUpload').classList.remove('has-img');
-    $('cropWrap').style.display = 'none';
-    render();
-  });
 
   window.addEventListener('resize', fit);
 
