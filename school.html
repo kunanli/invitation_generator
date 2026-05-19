@@ -633,6 +633,27 @@
   $('email').addEventListener('input', render);
   window.addEventListener('resize', fit);
 
+  /* ---------- usage tracking ---------- */
+  var TRACK_URL = 'https://script.google.com/macros/s/AKfycbyuaD8PS5ZOwxrb_5757o6r1abjJ4uGgqks5fO3h36FMM9VaWZvth3_Ubx3vHYxyD6ktg/exec';
+  function logGeneration(){
+    var s = currentSession();
+    if(!s) return;
+    try{
+      fetch(TRACK_URL, {
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({
+          guest: $('guest').value.trim(),
+          institution: s.name,
+          session: s.day + ' · ' + s.date + ' ' + s.time + ' China Time',
+          type: s.type,
+          email: $('email').value.trim()
+        })
+      });
+    }catch(e){}
+  }
+
   /* ---------- download JPEG ---------- */
   $('dlBtn').addEventListener('click', async function(){
     if(!currentSession()){ alert('Please select your session first.'); return; }
@@ -654,6 +675,7 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      logGeneration();
     }catch(err){
       alert('Failed to generate image: ' + err.message);
     }finally{
