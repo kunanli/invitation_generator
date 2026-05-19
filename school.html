@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Invitation Generator · GGAES 2026</title>
+<title>Guest Invitation Generator · GGAES 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -189,23 +189,23 @@
 
   <!-- ============ FORM ============ -->
   <div class="form-col">
-    <h1>Student Invitation Generator</h1>
-    <p class="sub">Select your institution to auto-fill the session details, then enter a student's name to generate that student's invitation.</p>
+    <h1>Guest Invitation Generator</h1>
+    <p class="sub">Select your session to auto-fill its details, then enter a guest's name to generate that guest's invitation.</p>
 
     <div class="field">
-      <label>Your Institution <span class="req">*</span></label>
-      <select id="school">
-        <option value="">— Select your institution —</option>
+      <label>Your Session <span class="req">*</span></label>
+      <select id="session">
+        <option value="">— Select your session —</option>
       </select>
     </div>
 
     <div class="field">
-      <label>Student Name <span class="req">*</span></label>
-      <input type="text" id="student" placeholder="Enter the student's name">
-      <div class="tip">One invitation per student: enter a name, download, then move on to the next.</div>
+      <label>Guest Name <span class="req">*</span></label>
+      <input type="text" id="guest" placeholder="Enter the guest's name">
+      <div class="tip">One invitation per guest: enter a name, download, then move on to the next.</div>
     </div>
 
-    <div class="info-panel empty" id="infoPanel">Session details will appear here once you select your institution.</div>
+    <div class="info-panel empty" id="infoPanel">Session details will appear here once you select your session.</div>
 
     <div class="actions">
       <button class="btn btn-primary" id="dlBtn">Download JPEG</button>
@@ -233,10 +233,10 @@
           </div>
 
           <div class="school-logo" id="pvLogo">
-            <div class="ph">Institution Logo</div>
+            <div class="ph">Logo</div>
           </div>
 
-          <div class="speaker" id="pvGreeting">Dear Student,</div>
+          <div class="speaker" id="pvGreeting">Dear Guest,</div>
 
           <div class="topic-row">
             <div class="lbl">Presentation Topic：</div>
@@ -278,114 +278,152 @@
   var TBA = 'To be announced';
 
   /* ============================================================
-     INSTITUTION SESSION DATA — maintained by the organiser.
-     One object per institution. Fields:
-       name      : institution name (shown in the dropdown and card)
+     SESSION DATA — maintained by the organiser.
+     One object per summit session. Fields:
+       name      : institution / company / speaker name (shown on card)
+       type      : 'school'  -> footer points to the Admissions Office
+                   'keynote' -> footer is a generic contact line
        logo      : path to a logo image (leave empty to show the
-                   institution name as text on the card)
+                   name as text on the card)
        speaker   : speaker name(s)
        topic     : presentation topic
        platform  : meeting platform (a value containing "voov" gets
                    an automatic download link)
-       tz        : institution's IANA time zone, e.g. 'Europe/London'
+       tz        : the entity's IANA time zone, e.g. 'Europe/London'.
+                   Use 'Asia/Shanghai' for China-based entities — the
+                   card then shows China time only (no second line).
        day       : 'Day 1' / 'Day 2' / 'Day 3'
        date      : session date 'YYYY-MM-DD' in China time (UTC+8)
        time      : session time 'HH:MM', 24-hour, in China time (UTC+8)
        meetingId : meeting ID for the session
-       email     : institution admissions office email
+       email     : contact email (institution admissions / keynote)
        notes     : optional; participation notes, one per line (\n).
                    Omit to use DEFAULT_NOTES below.
 
      day / date / time / topic / speaker come from the official GGAES
-     2026 schedule (times stored in China Standard Time, UTC+8; the card
-     converts them to each institution's local time). Still to be filled
+     2026 schedule (times stored in China Standard Time, UTC+8; the
+     card converts them to the entity's local time). Still to be filled
      by the organiser: meetingId, email, logo. tz values are best-guess
-     from each institution's location — please verify.
+     from each entity's location — please verify.
      ============================================================ */
   var DEFAULT_NOTES =
     'Please join the meeting 15 minutes early and wait.\n' +
     'Rename yourself to your real name; you will be admitted when the session begins.';
 
-  var INSTITUTIONS = [
-    { name:'Southern Methodist University', logo:'',
+  var SESSIONS = [
+    /* ---- Day 1 — Fri, Jun 26 ---- */
+    { name:'Global Game Jam', type:'keynote', logo:'',
+      speaker:'Maria Burns Ortiz',
+      topic:'Game Jams: The Ultimate XP Boost',
+      platform:'Voov Meeting', tz:'America/Los_Angeles',
+      day:'Day 1', date:'2026-06-26', time:'09:00', meetingId:'', email:'' },
+    { name:'Southern Methodist University', type:'school', logo:'',
       speaker:'Joowon Kim MacDowell',
       topic:'How We Become a Professional Game Artist — Leveling Up in SMU',
       platform:'Voov Meeting', tz:'America/Chicago',
       day:'Day 1', date:'2026-06-26', time:'09:30', meetingId:'', email:'' },
-    { name:'California Institute of the Arts', logo:'',
+    { name:'California Institute of the Arts', type:'school', logo:'',
       speaker:'Patrick Schmid',
       topic:'Storytellers Beyond the Algorithm: From Students to Creators of the Stories You Know',
       platform:'Voov Meeting', tz:'America/Los_Angeles',
       day:'Day 1', date:'2026-06-26', time:'10:30', meetingId:'', email:'' },
-    { name:'Hong Kong Polytechnic University', logo:'',
+    { name:'Hong Kong Polytechnic University', type:'school', logo:'',
       speaker:'Jae-Eun Oh',
       topic:'Bridging Education and Industry: New Horizons in Immersive Media',
       platform:'Voov Meeting', tz:'Asia/Hong_Kong',
       day:'Day 1', date:'2026-06-26', time:'11:30', meetingId:'', email:'' },
-    { name:'University of the Arts London', logo:'',
+    { name:'Tencent Games', type:'keynote', logo:'',
+      speaker:'Shaojun Sun & Irene Liu',
+      topic:'Reshaping the Creative Paradigm: When AIGC Meets the Next Generation of Animation & Game Developers',
+      platform:'Voov Meeting', tz:'Asia/Shanghai',
+      day:'Day 1', date:'2026-06-26', time:'15:30', meetingId:'', email:'' },
+    { name:'University of the Arts London', type:'school', logo:'',
       speaker:'Yi Tan',
       topic:'Art Meets Technology: How UAL Empowers Game Creation Both Ways',
       platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 1', date:'2026-06-26', time:'16:00', meetingId:'', email:'' },
-    { name:'Escape Studios', logo:'',
+    { name:'Escape Studios', type:'school', logo:'',
       speaker:'Niccolò Temperanza',
       topic:'From Concept to Screen: How Professional Game Artists Work at Escape Studios',
       platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 1', date:'2026-06-26', time:'17:00', meetingId:'', email:'' },
-    { name:'University of Utah', logo:'',
+
+    /* ---- Day 2 — Sat, Jun 27 ---- */
+    { name:'Unreal Engine', type:'keynote', logo:'',
+      speaker:'Chris Ebeling',
+      topic:'From Passion to Profession: Navigating Careers in Game Development and Beyond',
+      platform:'Voov Meeting', tz:'America/New_York',
+      day:'Day 2', date:'2026-06-27', time:'09:00', meetingId:'', email:'' },
+    { name:'University of Utah', type:'school', logo:'',
       speaker:'Ryan Bown',
       topic:'10 Questions You Should Ask Before Applying to School',
       platform:'Voov Meeting', tz:'America/Denver',
       day:'Day 2', date:'2026-06-27', time:'09:30', meetingId:'', email:'' },
-    { name:'DigiPen Institute of Technology (USA)', logo:'',
+    { name:'DigiPen Institute of Technology (USA)', type:'school', logo:'',
       speaker:'Matt Brunner & Tan Yong Zhen',
       topic:'From Playing Games to Making Games: Careers in Game Development',
       platform:'Voov Meeting', tz:'America/Los_Angeles',
       day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'', email:'' },
-    { name:'DigiPen Institute of Technology (Singapore)', logo:'',
+    { name:'DigiPen Institute of Technology (Singapore)', type:'school', logo:'',
       speaker:'Matt Brunner & Tan Yong Zhen',
       topic:'From Playing Games to Making Games: Careers in Game Development',
       platform:'Voov Meeting', tz:'Asia/Singapore',
       day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'', email:'' },
-    { name:'MAGES Institute (Singapore)', logo:'',
+    { name:'MAGES Institute (Singapore)', type:'school', logo:'',
       speaker:'Kingston Chan',
       topic:'The Value of Entertainment Art: What Skillset Is Needed as an Artist in the Industry',
       platform:'Voov Meeting', tz:'Asia/Singapore',
       day:'Day 2', date:'2026-06-27', time:'11:30', meetingId:'', email:'' },
-    { name:'The Glasgow School of Art', logo:'',
+    { name:'Escape Studios', type:'keynote', logo:'',
+      speaker:'Philip Meredith',
+      topic:"How to Land Your First Job in Games: An Insider's Guide from Escape Studios",
+      platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'15:30', meetingId:'', email:'' },
+    { name:'The Glasgow School of Art', type:'school', logo:'',
       speaker:'Russell Miller & Daniel Livingstone',
       topic:'', platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 2', date:'2026-06-27', time:'16:00', meetingId:'', email:'' },
-    { name:'Bournemouth University', logo:'',
+    { name:'Bournemouth University', type:'school', logo:'',
       speaker:'Xiaosong Yang',
       topic:'AI Reshaping the Creative Future: How Art Students Can Seize the New AI Track in the Media Industry',
       platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 2', date:'2026-06-27', time:'17:00', meetingId:'', email:'' },
-    { name:'University of Staffordshire', logo:'',
+    { name:'University of Staffordshire', type:'school', logo:'',
       speaker:'Chris Headleand',
       topic:'', platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 2', date:'2026-06-27', time:'18:00', meetingId:'', email:'' },
-    { name:'Gnomon', logo:'',
+
+    /* ---- Day 3 — Sun, Jun 28 ---- */
+    { name:'Jin Wang', type:'keynote', logo:'',
+      speaker:'Jin Wang',
+      topic:'Creative Fusion of the UE Physics Engine and Sensors',
+      platform:'Voov Meeting', tz:'Asia/Shanghai',
+      day:'Day 3', date:'2026-06-28', time:'09:00', meetingId:'', email:'' },
+    { name:'Gnomon', type:'school', logo:'',
       speaker:'Ashley Stegon',
       topic:'Creature Design Pipeline: Starting the ZBrush Sculpt from a 2D Concept',
       platform:'Voov Meeting', tz:'America/Los_Angeles',
       day:'Day 3', date:'2026-06-28', time:'09:30', meetingId:'', email:'' },
-    { name:'Otis College of Art and Design', logo:'',
+    { name:'Otis College of Art and Design', type:'school', logo:'',
       speaker:'Joffery Black & Darren Phillipson',
       topic:'Game and Entertainment Design Overview',
       platform:'Voov Meeting', tz:'America/Los_Angeles',
       day:'Day 3', date:'2026-06-28', time:'10:30', meetingId:'', email:'' },
-    { name:'Teesside University', logo:'',
+    { name:'University of Staffordshire', type:'keynote', logo:'',
+      speaker:'Christopher Headleand',
+      topic:'', platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'15:30', meetingId:'', email:'' },
+    { name:'Teesside University', type:'school', logo:'',
       speaker:'Pingyao Sun',
       topic:"Building a China–UK Creative Industry Talent Bridge: Teesside University's Perspective and Practice",
       platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 3', date:'2026-06-28', time:'16:00', meetingId:'', email:'' },
-    { name:'Abertay University', logo:'',
+    { name:'Abertay University', type:'school', logo:'',
       speaker:'Ruth Falconer & Phillip Vaughan',
       topic:'Create the Unreal: Next-Level Visual Effects Starts Here...',
       platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 3', date:'2026-06-28', time:'17:00', meetingId:'', email:'' },
-    { name:'University of Hertfordshire', logo:'',
+    { name:'University of Hertfordshire', type:'school', logo:'',
       speaker:'David Tree',
       topic:'', platform:'Voov Meeting', tz:'Europe/London',
       day:'Day 3', date:'2026-06-28', time:'18:00', meetingId:'', email:'' }
@@ -428,40 +466,40 @@
     return p.year+'.'+p.month+'.'+p.day+'  '+hh+':'+p.minute;
   }
 
-  function hasSessionTime(inst){ return !!(inst.date && inst.time); }
+  function hasSessionTime(s){ return !!(s.date && s.time); }
 
-  function sessionInstant(inst){
-    var dp = inst.date.split('-'), tp = inst.time.split(':');
+  function sessionInstant(s){
+    var dp = s.date.split('-'), tp = s.time.split(':');
     return wallToInstant(+dp[0],+dp[1],+dp[2],+tp[0],+tp[1],'Asia/Shanghai');
   }
 
-  /* ---------- populate institution dropdown ---------- */
-  var sel = $('school');
-  INSTITUTIONS.forEach(function(inst,i){
+  /* ---------- populate session dropdown ---------- */
+  var sel = $('session');
+  SESSIONS.forEach(function(s,i){
     var o = document.createElement('option');
     o.value = String(i);
-    o.textContent = inst.name;
+    o.textContent = s.name + ' · ' + s.day + (s.type==='keynote' ? ' · Keynote' : '');
     sel.appendChild(o);
   });
 
-  function currentInstitution(){
+  function currentSession(){
     var v = sel.value;
-    return v==='' ? null : INSTITUTIONS[+v];
+    return v==='' ? null : SESSIONS[+v];
   }
 
   /* ---------- render ---------- */
   function render(){
-    var inst = currentInstitution();
-    var sname = $('student').value.trim();
-    $('pvGreeting').textContent = 'Dear ' + (sname || 'Student') + ',';
+    var s = currentSession();
+    var gname = $('guest').value.trim();
+    $('pvGreeting').textContent = 'Dear ' + (gname || 'Guest') + ',';
 
     var pv = $('pvLogo');
     pv.innerHTML = '';
 
-    if(!inst){
+    if(!s){
       var ph = document.createElement('div');
       ph.className = 'ph';
-      ph.textContent = 'Institution Logo';
+      ph.textContent = 'Logo';
       pv.appendChild(ph);
       $('pvTopic').textContent = '';
       $('pvSpeaker').textContent = '';
@@ -473,33 +511,33 @@
       $('pvNotes').innerHTML = '';
       $('pvFooter').textContent = '';
       $('infoPanel').className = 'info-panel empty';
-      $('infoPanel').textContent = 'Session details will appear here once you select your institution.';
+      $('infoPanel').textContent = 'Session details will appear here once you select your session.';
       fit();
       return;
     }
 
     // logo
-    if(inst.logo){
+    if(s.logo){
       var im = document.createElement('img');
-      im.src = inst.logo;
-      im.alt = inst.name;
+      im.src = s.logo;
+      im.alt = s.name;
       pv.appendChild(im);
     }else{
       var lt = document.createElement('div');
       lt.className = 'logo-text';
-      lt.textContent = inst.name;
+      lt.textContent = s.name;
       pv.appendChild(lt);
     }
 
-    $('pvTopic').textContent   = inst.topic || TBA;
-    $('pvSpeaker').textContent = inst.speaker || TBA;
-    $('pvDay').textContent     = inst.day || TBA;
-    $('pvMid').textContent     = inst.meetingId || TBA;
+    $('pvTopic').textContent   = s.topic || TBA;
+    $('pvSpeaker').textContent = s.speaker || TBA;
+    $('pvDay').textContent     = s.day || TBA;
+    $('pvMid').textContent     = s.meetingId || TBA;
 
     // platform (auto-link Voov)
     var platEl = $('pvMplat');
     platEl.innerHTML = '';
-    var platform = inst.platform || 'Voov Meeting';
+    var platform = s.platform || 'Voov Meeting';
     if(/voov/i.test(platform)){
       var a = document.createElement('a');
       a.href = 'https://voovmeeting.com/download-center.html';
@@ -512,12 +550,18 @@
       platEl.textContent = platform;
     }
 
-    // session time -> institution local + China time
-    if(hasSessionTime(inst)){
-      var instant = sessionInstant(inst);
-      var off = offsetLabel(instant, inst.tz);
-      $('pvSlocal').textContent = fmtDateTime(instant,inst.tz)+'   '+tzCity(inst.tz)+' Time'+(off?' ('+off+')':'');
-      $('pvScn').textContent = fmtDateTime(instant,'Asia/Shanghai')+'   China Standard Time (UTC+8)';
+    // session time -> China time, plus the entity's local time
+    if(hasSessionTime(s)){
+      var instant = sessionInstant(s);
+      var chinaTxt = fmtDateTime(instant,'Asia/Shanghai')+'   China Standard Time (UTC+8)';
+      if(s.tz && s.tz !== 'Asia/Shanghai'){
+        var off = offsetLabel(instant, s.tz);
+        $('pvSlocal').textContent = fmtDateTime(instant,s.tz)+'   '+tzCity(s.tz)+' Time'+(off?' ('+off+')':'');
+        $('pvScn').textContent = chinaTxt;
+      }else{
+        $('pvSlocal').textContent = chinaTxt;
+        $('pvScn').textContent = '';
+      }
     }else{
       $('pvSlocal').textContent = TBA;
       $('pvScn').textContent = '';
@@ -526,23 +570,30 @@
     // notes
     var ul = $('pvNotes');
     ul.innerHTML = '';
-    (inst.notes || DEFAULT_NOTES).split('\n').map(function(s){return s.trim();})
-      .filter(function(s){return s.length;})
+    (s.notes || DEFAULT_NOTES).split('\n').map(function(x){return x.trim();})
+      .filter(function(x){return x.length;})
       .forEach(function(t){
         var li = document.createElement('li');
         li.textContent = t;
         ul.appendChild(li);
       });
 
-    $('pvFooter').textContent = inst.email
-      ? ('For enquiries, please contact the ' + inst.name + ' Admissions Office: ' + inst.email)
-      : ('For enquiries, please contact the ' + inst.name + ' Admissions Office.');
+    // footer
+    if(s.type === 'keynote'){
+      $('pvFooter').textContent = s.email
+        ? ('For enquiries, please contact ' + s.name + ': ' + s.email)
+        : ('For enquiries, please contact ' + s.name + '.');
+    }else{
+      $('pvFooter').textContent = s.email
+        ? ('For enquiries, please contact the ' + s.name + ' Admissions Office: ' + s.email)
+        : ('For enquiries, please contact the ' + s.name + ' Admissions Office.');
+    }
 
-    renderInfoPanel(inst);
+    renderInfoPanel(s);
     fit();
   }
 
-  function renderInfoPanel(inst){
+  function renderInfoPanel(s){
     var panel = $('infoPanel');
     panel.className = 'info-panel';
     panel.innerHTML = '';
@@ -550,15 +601,19 @@
     title.className = 'ip-title';
     title.textContent = 'Session details (set by the organiser)';
     panel.appendChild(title);
-    var sessionTxt = hasSessionTime(inst)
-      ? ((inst.day ? inst.day + ' · ' : '') + fmtDateTime(sessionInstant(inst),inst.tz) + ' ' + tzCity(inst.tz))
-      : ((inst.day || 'Day —') + ' · ' + TBA);
+    var sessionTxt;
+    if(hasSessionTime(s)){
+      var inst = sessionInstant(s);
+      sessionTxt = s.day + ' · ' + fmtDateTime(inst,'Asia/Shanghai') + ' China Time';
+    }else{
+      sessionTxt = (s.day || 'Day —') + ' · ' + TBA;
+    }
     var rows = [
       ['Session', sessionTxt],
-      ['Topic', inst.topic || TBA],
-      ['Speaker', inst.speaker || TBA],
-      ['Meeting ID', inst.meetingId || TBA],
-      ['Admissions', inst.email || TBA]
+      ['Topic', s.topic || TBA],
+      ['Speaker', s.speaker || TBA],
+      ['Meeting ID', s.meetingId || TBA],
+      [s.type==='keynote' ? 'Contact' : 'Admissions', s.email || TBA]
     ];
     rows.forEach(function(r){
       var row = document.createElement('div');
@@ -580,13 +635,13 @@
   }
 
   sel.addEventListener('change', render);
-  $('student').addEventListener('input', render);
+  $('guest').addEventListener('input', render);
   window.addEventListener('resize', fit);
 
   /* ---------- download JPEG ---------- */
   $('dlBtn').addEventListener('click', async function(){
-    if(!currentInstitution()){ alert('Please select your institution first.'); return; }
-    if(!$('student').value.trim()){ alert("Please enter the student's name first."); return; }
+    if(!currentSession()){ alert('Please select your session first.'); return; }
+    if(!$('guest').value.trim()){ alert("Please enter the guest's name first."); return; }
     var btn = this;
     btn.disabled = true;
     var label = btn.textContent;
@@ -598,7 +653,7 @@
       });
       var url = canvas.toDataURL('image/jpeg', 0.95);
       var a = document.createElement('a');
-      var name = ($('student').value || 'student').replace(/[^\w一-龥-]+/g,'_');
+      var name = ($('guest').value || 'guest').replace(/[^\w一-龥-]+/g,'_');
       a.href = url;
       a.download = 'invitation_' + name + '.jpg';
       document.body.appendChild(a);
@@ -614,7 +669,7 @@
 
   /* ---------- print / PDF ---------- */
   $('pdfBtn').addEventListener('click', function(){
-    if(!currentInstitution()){ alert('Please select your institution first.'); return; }
+    if(!currentSession()){ alert('Please select your session first.'); return; }
     window.print();
   });
 
