@@ -139,7 +139,6 @@
   .topic-row .val{
     color:var(--deep);font-size:30px;font-weight:500;line-height:1.32;
   }
-  .plat-link{color:inherit;text-decoration:underline;text-underline-offset:3px;}
   .meta{margin-top:40px;position:relative;z-index:2;}
   .meta .line{
     font-size:33px;color:#23252e;margin-bottom:14px;font-weight:400;
@@ -203,6 +202,12 @@
       <label>Guest Name <span class="req">*</span></label>
       <input type="text" id="guest" placeholder="Enter the guest's name">
       <div class="tip">One invitation per guest: enter a name, download, then move on to the next.</div>
+    </div>
+
+    <div class="field">
+      <label>Admissions / Contact Email</label>
+      <input type="text" id="email" placeholder="e.g. admissions@your-institution.edu">
+      <div class="tip">The admissions office enters this; it appears at the bottom of the invitation.</div>
     </div>
 
     <div class="info-panel empty" id="infoPanel">Session details will appear here once you select your session.</div>
@@ -283,12 +288,11 @@
        name      : institution / company / speaker name (shown on card)
        type      : 'school'  -> footer points to the Admissions Office
                    'keynote' -> footer is a generic contact line
-       logo      : path to a logo image (leave empty to show the
-                   name as text on the card)
+       logo      : logo image file (leave empty to show the name as
+                   text on the card)
        speaker   : speaker name(s)
        topic     : presentation topic
-       platform  : meeting platform (a value containing "voov" gets
-                   an automatic download link)
+       platform  : meeting platform shown on the card
        tz        : the entity's IANA time zone, e.g. 'Europe/London'.
                    Use 'Asia/Shanghai' for China-based entities — the
                    card then shows China time only (no second line).
@@ -296,137 +300,138 @@
        date      : session date 'YYYY-MM-DD' in China time (UTC+8)
        time      : session time 'HH:MM', 24-hour, in China time (UTC+8)
        meetingId : meeting ID for the session
-       email     : contact email (institution admissions / keynote)
        notes     : optional; participation notes, one per line (\n).
                    Omit to use DEFAULT_NOTES below.
 
      day / date / time / topic / speaker come from the official GGAES
-     2026 schedule (times stored in China Standard Time, UTC+8; the
-     card converts them to the entity's local time). Still to be filled
-     by the organiser: meetingId, email, logo. tz values are best-guess
-     from each entity's location — please verify.
+     2026 schedule (times stored in China Standard Time, UTC+8; the card
+     converts them to the entity's local time). meetingId is still to be
+     filled by the organiser. The contact email is entered in the form
+     by the user. tz values are best-guess from each entity's location —
+     please verify.
      ============================================================ */
   var DEFAULT_NOTES =
+    'Participants in mainland China should use Tencent Meeting; participants outside mainland China should use VooV Meeting. Please register an account in advance.\n' +
     'Please join the meeting 15 minutes early and wait.\n' +
     'Rename yourself to your real name; you will be admitted when the session begins.';
 
   var SESSIONS = [
     /* ---- Day 1 — Fri, Jun 26 ---- */
-    { name:'Global Game Jam', type:'keynote', logo:'',
+    { name:'Global Game Jam', type:'keynote', logo:'GGJ.webp',
       speaker:'Maria Burns Ortiz',
       topic:'Game Jams: The Ultimate XP Boost',
-      platform:'Voov Meeting', tz:'America/Los_Angeles',
-      day:'Day 1', date:'2026-06-26', time:'09:00', meetingId:'', email:'' },
-    { name:'Southern Methodist University', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/Los_Angeles',
+      day:'Day 1', date:'2026-06-26', time:'09:00', meetingId:'' },
+    { name:'Southern Methodist University', type:'school', logo:'SMU.webp',
       speaker:'Joowon Kim MacDowell',
       topic:'How We Become a Professional Game Artist — Leveling Up in SMU',
-      platform:'Voov Meeting', tz:'America/Chicago',
-      day:'Day 1', date:'2026-06-26', time:'09:30', meetingId:'', email:'' },
-    { name:'California Institute of the Arts', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/Chicago',
+      day:'Day 1', date:'2026-06-26', time:'09:30', meetingId:'' },
+    { name:'California Institute of the Arts', type:'school', logo:'Calarts.webp',
       speaker:'Patrick Schmid',
       topic:'Storytellers Beyond the Algorithm: From Students to Creators of the Stories You Know',
-      platform:'Voov Meeting', tz:'America/Los_Angeles',
-      day:'Day 1', date:'2026-06-26', time:'10:30', meetingId:'', email:'' },
-    { name:'Hong Kong Polytechnic University', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/Los_Angeles',
+      day:'Day 1', date:'2026-06-26', time:'10:30', meetingId:'' },
+    { name:'Hong Kong Polytechnic University', type:'school', logo:'PolyU.webp',
       speaker:'Jae-Eun Oh',
       topic:'Bridging Education and Industry: New Horizons in Immersive Media',
-      platform:'Voov Meeting', tz:'Asia/Hong_Kong',
-      day:'Day 1', date:'2026-06-26', time:'11:30', meetingId:'', email:'' },
-    { name:'Tencent Games', type:'keynote', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Asia/Hong_Kong',
+      day:'Day 1', date:'2026-06-26', time:'11:30', meetingId:'' },
+    { name:'Tencent Games', type:'keynote', logo:'Tencent.webp',
       speaker:'Shaojun Sun & Irene Liu',
       topic:'Reshaping the Creative Paradigm: When AIGC Meets the Next Generation of Animation & Game Developers',
-      platform:'Voov Meeting', tz:'Asia/Shanghai',
-      day:'Day 1', date:'2026-06-26', time:'15:30', meetingId:'', email:'' },
-    { name:'University of the Arts London', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Asia/Shanghai',
+      day:'Day 1', date:'2026-06-26', time:'15:30', meetingId:'' },
+    { name:'University of the Arts London', type:'school', logo:'UAL.webp',
       speaker:'Yi Tan',
       topic:'Art Meets Technology: How UAL Empowers Game Creation Both Ways',
-      platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 1', date:'2026-06-26', time:'16:00', meetingId:'', email:'' },
-    { name:'Escape Studios', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 1', date:'2026-06-26', time:'16:00', meetingId:'' },
+    { name:'Escape Studios', type:'school', logo:'Escape.webp',
       speaker:'Niccolò Temperanza',
       topic:'From Concept to Screen: How Professional Game Artists Work at Escape Studios',
-      platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 1', date:'2026-06-26', time:'17:00', meetingId:'', email:'' },
+      platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 1', date:'2026-06-26', time:'17:00', meetingId:'' },
 
     /* ---- Day 2 — Sat, Jun 27 ---- */
-    { name:'Unreal Engine', type:'keynote', logo:'',
+    { name:'Unreal Engine', type:'keynote', logo:'UnrealEngine.webp',
       speaker:'Chris Ebeling',
       topic:'From Passion to Profession: Navigating Careers in Game Development and Beyond',
-      platform:'Voov Meeting', tz:'America/New_York',
-      day:'Day 2', date:'2026-06-27', time:'09:00', meetingId:'', email:'' },
-    { name:'University of Utah', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/New_York',
+      day:'Day 2', date:'2026-06-27', time:'09:00', meetingId:'' },
+    { name:'University of Utah', type:'school', logo:'Utah.webp',
       speaker:'Ryan Bown',
       topic:'10 Questions You Should Ask Before Applying to School',
-      platform:'Voov Meeting', tz:'America/Denver',
-      day:'Day 2', date:'2026-06-27', time:'09:30', meetingId:'', email:'' },
-    { name:'DigiPen Institute of Technology (USA)', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/Denver',
+      day:'Day 2', date:'2026-06-27', time:'09:30', meetingId:'' },
+    { name:'DigiPen Institute of Technology (USA)', type:'school', logo:'DigiPen_web_logo.webp',
       speaker:'Matt Brunner & Tan Yong Zhen',
       topic:'From Playing Games to Making Games: Careers in Game Development',
-      platform:'Voov Meeting', tz:'America/Los_Angeles',
-      day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'', email:'' },
-    { name:'DigiPen Institute of Technology (Singapore)', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/Los_Angeles',
+      day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'' },
+    { name:'DigiPen Institute of Technology (Singapore)', type:'school', logo:'DigiPen_web_logo.webp',
       speaker:'Matt Brunner & Tan Yong Zhen',
       topic:'From Playing Games to Making Games: Careers in Game Development',
-      platform:'Voov Meeting', tz:'Asia/Singapore',
-      day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'', email:'' },
-    { name:'MAGES Institute (Singapore)', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Asia/Singapore',
+      day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'' },
+    { name:'MAGES Institute (Singapore)', type:'school', logo:'MAGES.webp',
       speaker:'Kingston Chan',
       topic:'The Value of Entertainment Art: What Skillset Is Needed as an Artist in the Industry',
-      platform:'Voov Meeting', tz:'Asia/Singapore',
-      day:'Day 2', date:'2026-06-27', time:'11:30', meetingId:'', email:'' },
-    { name:'Escape Studios', type:'keynote', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Asia/Singapore',
+      day:'Day 2', date:'2026-06-27', time:'11:30', meetingId:'' },
+    { name:'Escape Studios', type:'keynote', logo:'Escape.webp',
       speaker:'Philip Meredith',
       topic:"How to Land Your First Job in Games: An Insider's Guide from Escape Studios",
-      platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 2', date:'2026-06-27', time:'15:30', meetingId:'', email:'' },
-    { name:'The Glasgow School of Art', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'15:30', meetingId:'' },
+    { name:'The Glasgow School of Art', type:'school', logo:'GSA.webp',
       speaker:'Russell Miller & Daniel Livingstone',
-      topic:'', platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 2', date:'2026-06-27', time:'16:00', meetingId:'', email:'' },
-    { name:'Bournemouth University', type:'school', logo:'',
+      topic:'', platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'16:00', meetingId:'' },
+    { name:'Bournemouth University', type:'school', logo:'Bu.webp',
       speaker:'Xiaosong Yang',
       topic:'AI Reshaping the Creative Future: How Art Students Can Seize the New AI Track in the Media Industry',
-      platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 2', date:'2026-06-27', time:'17:00', meetingId:'', email:'' },
-    { name:'University of Staffordshire', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'17:00', meetingId:'' },
+    { name:'University of Staffordshire', type:'school', logo:'Staffordshire.webp',
       speaker:'Chris Headleand',
-      topic:'', platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 2', date:'2026-06-27', time:'18:00', meetingId:'', email:'' },
+      topic:'', platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'18:00', meetingId:'' },
 
     /* ---- Day 3 — Sun, Jun 28 ---- */
     { name:'Jin Wang', type:'keynote', logo:'',
       speaker:'Jin Wang',
       topic:'Creative Fusion of the UE Physics Engine and Sensors',
-      platform:'Voov Meeting', tz:'Asia/Shanghai',
-      day:'Day 3', date:'2026-06-28', time:'09:00', meetingId:'', email:'' },
-    { name:'Gnomon', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Asia/Shanghai',
+      day:'Day 3', date:'2026-06-28', time:'09:00', meetingId:'' },
+    { name:'Gnomon', type:'school', logo:'Gnomon.webp',
       speaker:'Ashley Stegon',
       topic:'Creature Design Pipeline: Starting the ZBrush Sculpt from a 2D Concept',
-      platform:'Voov Meeting', tz:'America/Los_Angeles',
-      day:'Day 3', date:'2026-06-28', time:'09:30', meetingId:'', email:'' },
-    { name:'Otis College of Art and Design', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/Los_Angeles',
+      day:'Day 3', date:'2026-06-28', time:'09:30', meetingId:'' },
+    { name:'Otis College of Art and Design', type:'school', logo:'OTis.webp',
       speaker:'Joffery Black & Darren Phillipson',
       topic:'Game and Entertainment Design Overview',
-      platform:'Voov Meeting', tz:'America/Los_Angeles',
-      day:'Day 3', date:'2026-06-28', time:'10:30', meetingId:'', email:'' },
-    { name:'University of Staffordshire', type:'keynote', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'America/Los_Angeles',
+      day:'Day 3', date:'2026-06-28', time:'10:30', meetingId:'' },
+    { name:'University of Staffordshire', type:'keynote', logo:'Staffordshire.webp',
       speaker:'Christopher Headleand',
-      topic:'', platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 3', date:'2026-06-28', time:'15:30', meetingId:'', email:'' },
-    { name:'Teesside University', type:'school', logo:'',
+      topic:'', platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'15:30', meetingId:'' },
+    { name:'Teesside University', type:'school', logo:'Teessi.webp',
       speaker:'Pingyao Sun',
       topic:"Building a China–UK Creative Industry Talent Bridge: Teesside University's Perspective and Practice",
-      platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 3', date:'2026-06-28', time:'16:00', meetingId:'', email:'' },
-    { name:'Abertay University', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'16:00', meetingId:'' },
+    { name:'Abertay University', type:'school', logo:'Abertay.webp',
       speaker:'Ruth Falconer & Phillip Vaughan',
       topic:'Create the Unreal: Next-Level Visual Effects Starts Here...',
-      platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 3', date:'2026-06-28', time:'17:00', meetingId:'', email:'' },
-    { name:'University of Hertfordshire', type:'school', logo:'',
+      platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'17:00', meetingId:'' },
+    { name:'University of Hertfordshire', type:'school', logo:'University_of_Hertfordshire_Logo.svg.webp',
       speaker:'David Tree',
-      topic:'', platform:'Voov Meeting', tz:'Europe/London',
-      day:'Day 3', date:'2026-06-28', time:'18:00', meetingId:'', email:'' }
+      topic:'', platform:'Tencent Meeting / VooV Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'18:00', meetingId:'' }
   ];
 
   /* ---------- time zone helpers ---------- */
@@ -533,22 +538,7 @@
     $('pvSpeaker').textContent = s.speaker || TBA;
     $('pvDay').textContent     = s.day || TBA;
     $('pvMid').textContent     = s.meetingId || TBA;
-
-    // platform (auto-link Voov)
-    var platEl = $('pvMplat');
-    platEl.innerHTML = '';
-    var platform = s.platform || 'Voov Meeting';
-    if(/voov/i.test(platform)){
-      var a = document.createElement('a');
-      a.href = 'https://voovmeeting.com/download-center.html';
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.className = 'plat-link';
-      a.textContent = platform;
-      platEl.appendChild(a);
-    }else{
-      platEl.textContent = platform;
-    }
+    $('pvMplat').textContent   = s.platform || 'Tencent Meeting / VooV Meeting';
 
     // session time -> China time, plus the entity's local time
     if(hasSessionTime(s)){
@@ -578,14 +568,15 @@
         ul.appendChild(li);
       });
 
-    // footer
+    // footer (contact email entered in the form)
+    var email = $('email').value.trim();
     if(s.type === 'keynote'){
-      $('pvFooter').textContent = s.email
-        ? ('For enquiries, please contact ' + s.name + ': ' + s.email)
+      $('pvFooter').textContent = email
+        ? ('For enquiries, please contact ' + s.name + ': ' + email)
         : ('For enquiries, please contact ' + s.name + '.');
     }else{
-      $('pvFooter').textContent = s.email
-        ? ('For enquiries, please contact the ' + s.name + ' Admissions Office: ' + s.email)
+      $('pvFooter').textContent = email
+        ? ('For enquiries, please contact the ' + s.name + ' Admissions Office: ' + email)
         : ('For enquiries, please contact the ' + s.name + ' Admissions Office.');
     }
 
@@ -612,8 +603,7 @@
       ['Session', sessionTxt],
       ['Topic', s.topic || TBA],
       ['Speaker', s.speaker || TBA],
-      ['Meeting ID', s.meetingId || TBA],
-      [s.type==='keynote' ? 'Contact' : 'Admissions', s.email || TBA]
+      ['Meeting ID', s.meetingId || TBA]
     ];
     rows.forEach(function(r){
       var row = document.createElement('div');
@@ -636,6 +626,7 @@
 
   sel.addEventListener('change', render);
   $('guest').addEventListener('input', render);
+  $('email').addEventListener('input', render);
   window.addEventListener('resize', fit);
 
   /* ---------- download JPEG ---------- */
