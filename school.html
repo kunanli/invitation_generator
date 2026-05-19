@@ -129,6 +129,10 @@
     line-height:1.05;border-bottom:2px solid #d9d9e2;padding-bottom:14px;
     position:relative;z-index:2;
   }
+  .welcome{
+    margin-top:26px;font-size:29px;color:#3a3a44;line-height:1.46;
+    position:relative;z-index:2;
+  }
   .topic-row{
     margin-top:22px;display:flex;gap:14px;align-items:baseline;
     position:relative;z-index:2;
@@ -243,6 +247,8 @@
 
           <div class="speaker" id="pvGreeting">Dear Guest,</div>
 
+          <div class="welcome">On behalf of the Global Game &amp; Animation Education Summit 2026, we are delighted to welcome you to join the session below. We look forward to seeing you there!</div>
+
           <div class="topic-row">
             <div class="lbl">Presentation Topic：</div>
             <div class="val" id="pvTopic"></div>
@@ -311,9 +317,7 @@
      please verify.
      ============================================================ */
   var DEFAULT_NOTES =
-    'Participants in mainland China should use Tencent Meeting; participants outside mainland China should use VooV Meeting. Please register an account in advance.\n' +
-    'Please join the meeting 15 minutes early and wait.\n' +
-    'Rename yourself to your real name; you will be admitted when the session begins.';
+    'Participants in mainland China should use Tencent Meeting; participants outside mainland China should use VooV Meeting. Please register an account in advance.';
 
   var SESSIONS = [
     /* ---- Day 1 — Fri, Jun 26 ---- */
