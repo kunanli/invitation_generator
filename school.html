@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>院校學生邀請函生成器 · Student Invitation Generator</title>
+<title>Student Invitation Generator · GGAES 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@
     display:flex;gap:8px;font-size:12px;margin-bottom:7px;line-height:1.4;
   }
   .info-panel .ip-row:last-child{margin-bottom:0;}
-  .info-panel .ip-k{flex:0 0 76px;color:#8a8ea3;font-weight:600;}
+  .info-panel .ip-k{flex:0 0 86px;color:#8a8ea3;font-weight:600;}
   .info-panel .ip-v{flex:1;color:#2b2e40;font-weight:600;word-break:break-word;}
   .info-panel.empty{color:#9498ab;font-size:12px;}
 
@@ -123,7 +123,6 @@
     width:100%;height:100%;display:flex;align-items:center;justify-content:center;
     border:2px dashed #c9cce0;border-radius:12px;
     color:#aab;font-size:25px;font-weight:600;
-    font-family:'Noto Sans SC',sans-serif;
   }
   .speaker{
     margin-top:30px;font-size:70px;font-weight:800;color:var(--purple);
@@ -190,34 +189,34 @@
 
   <!-- ============ FORM ============ -->
   <div class="form-col">
-    <h1>院校學生邀請函生成器</h1>
-    <p class="sub">選擇貴院校後，場次資訊將自動帶入。只需填入學生姓名，即可下載該學生的邀請函。</p>
+    <h1>Student Invitation Generator</h1>
+    <p class="sub">Select your institution to auto-fill the session details, then enter a student's name to generate that student's invitation.</p>
 
     <div class="field">
-      <label>選擇貴院校 Institution <span class="req">*</span></label>
+      <label>Your Institution <span class="req">*</span></label>
       <select id="school">
-        <option value="">— 請選擇您的院校 —</option>
+        <option value="">— Select your institution —</option>
       </select>
     </div>
 
     <div class="field">
-      <label>學生姓名 Student Name <span class="req">*</span></label>
-      <input type="text" id="student" placeholder="輸入該名學生的姓名">
-      <div class="tip">每位學生一張邀請函：填好姓名後下載，再換下一位。</div>
+      <label>Student Name <span class="req">*</span></label>
+      <input type="text" id="student" placeholder="Enter the student's name">
+      <div class="tip">One invitation per student: enter a name, download, then move on to the next.</div>
     </div>
 
-    <div class="info-panel empty" id="infoPanel">選擇院校後，此處顯示該場次的固定資訊。</div>
+    <div class="info-panel empty" id="infoPanel">Session details will appear here once you select your institution.</div>
 
     <div class="actions">
-      <button class="btn btn-primary" id="dlBtn">下載 JPEG</button>
-      <button class="btn btn-ghost" id="pdfBtn">列印 / 存 PDF</button>
+      <button class="btn btn-primary" id="dlBtn">Download JPEG</button>
+      <button class="btn btn-ghost" id="pdfBtn">Print / Save PDF</button>
     </div>
-    <div class="hint">場次、主題、演講者、會議號為主辦方預先設定，院校端不可修改。如資訊有誤請聯繫主辦方更新。</div>
+    <div class="hint">Session, topic, speaker and meeting ID are pre-set by the organiser and cannot be edited here. Contact the organiser if any detail is incorrect.</div>
   </div>
 
   <!-- ============ PREVIEW ============ -->
   <div class="preview-col">
-    <p class="panel-title">即時預覽</p>
+    <p class="panel-title">Live preview</p>
     <div id="previewBox">
       <div id="scaler">
         <div class="card" id="card">
@@ -234,7 +233,7 @@
           </div>
 
           <div class="school-logo" id="pvLogo">
-            <div class="ph">院校 LOGO</div>
+            <div class="ph">Institution Logo</div>
           </div>
 
           <div class="speaker" id="pvGreeting">Dear Student,</div>
@@ -276,52 +275,120 @@
 <script>
 (function(){
   var $ = function(id){return document.getElementById(id);};
+  var TBA = 'To be announced';
 
   /* ============================================================
-     院校場次資料 — 主辦方維護
-     每新增一間院校，於下方陣列加入一個物件。欄位說明：
-       name      : 院校名稱（顯示於下拉清單與卡片）
-       logo      : 院校 LOGO 圖片路徑（留空則於卡片顯示院校名稱文字）
-       speaker   : 演講者
-       topic     : 講座主題
-       platform  : 會議平台（含 "voov" 會自動加上下載連結）
-       tz        : 院校所在時區（IANA 時區字串，例 'Europe/London'）
-       day       : 場次日（'Day 1' / 'Day 2' / 'Day 3'）
-       date      : 場次日期 YYYY-MM-DD（院校當地時間）
-       time      : 場次時間 HH:MM（院校當地時間，24 小時制）
-       meetingId : 會議號
-       email     : 院校招生辦聯繫信箱
-       notes     : 參加須知，每行一條（用 \n 換行）
+     INSTITUTION SESSION DATA — maintained by the organiser.
+     One object per institution. Fields:
+       name      : institution name (shown in the dropdown and card)
+       logo      : path to a logo image (leave empty to show the
+                   institution name as text on the card)
+       speaker   : speaker name(s)
+       topic     : presentation topic
+       platform  : meeting platform (a value containing "voov" gets
+                   an automatic download link)
+       tz        : institution's IANA time zone, e.g. 'Europe/London'
+       day       : 'Day 1' / 'Day 2' / 'Day 3'
+       date      : session date 'YYYY-MM-DD' in China time (UTC+8)
+       time      : session time 'HH:MM', 24-hour, in China time (UTC+8)
+       meetingId : meeting ID for the session
+       email     : institution admissions office email
+       notes     : optional; participation notes, one per line (\n).
+                   Omit to use DEFAULT_NOTES below.
+
+     day / date / time / topic / speaker come from the official GGAES
+     2026 schedule (times stored in China Standard Time, UTC+8; the card
+     converts them to each institution's local time). Still to be filled
+     by the organiser: meetingId, email, logo. tz values are best-guess
+     from each institution's location — please verify.
      ============================================================ */
+  var DEFAULT_NOTES =
+    'Please join the meeting 15 minutes early and wait.\n' +
+    'Rename yourself to your real name; you will be admitted when the session begins.';
+
   var INSTITUTIONS = [
-    {
-      name: 'Escape Studios (London)',
-      logo: '',
-      speaker: 'Niccolo Temperanza',
-      topic: 'From Concept to Screen: How Professional Game Artists Work at Escape Studios',
-      platform: 'Voov Meeting',
-      tz: 'Europe/London',
-      day: 'Day 1',
-      date: '2026-06-26',
-      time: '09:00',
-      meetingId: '123 456 789',
-      email: 'admissions@escape-studios.example',
-      notes: 'Please join the meeting 15 minutes early and wait.\nRename yourself to your real name; we will admit you when the session begins.'
-    },
-    {
-      name: 'Example Art University',
-      logo: '',
-      speaker: 'Jane Doe',
-      topic: 'Building a Portfolio for Animation Programmes',
-      platform: 'Voov Meeting',
-      tz: 'America/New_York',
-      day: 'Day 2',
-      date: '2026-06-27',
-      time: '10:00',
-      meetingId: '987 654 321',
-      email: 'admissions@example-art.example',
-      notes: 'Please join the meeting 15 minutes early and wait.\nRename yourself to your real name before entering.'
-    }
+    { name:'Southern Methodist University', logo:'',
+      speaker:'Joowon Kim MacDowell',
+      topic:'How We Become a Professional Game Artist — Leveling Up in SMU',
+      platform:'Voov Meeting', tz:'America/Chicago',
+      day:'Day 1', date:'2026-06-26', time:'09:30', meetingId:'', email:'' },
+    { name:'California Institute of the Arts', logo:'',
+      speaker:'Patrick Schmid',
+      topic:'Storytellers Beyond the Algorithm: From Students to Creators of the Stories You Know',
+      platform:'Voov Meeting', tz:'America/Los_Angeles',
+      day:'Day 1', date:'2026-06-26', time:'10:30', meetingId:'', email:'' },
+    { name:'Hong Kong Polytechnic University', logo:'',
+      speaker:'Jae-Eun Oh',
+      topic:'Bridging Education and Industry: New Horizons in Immersive Media',
+      platform:'Voov Meeting', tz:'Asia/Hong_Kong',
+      day:'Day 1', date:'2026-06-26', time:'11:30', meetingId:'', email:'' },
+    { name:'University of the Arts London', logo:'',
+      speaker:'Yi Tan',
+      topic:'Art Meets Technology: How UAL Empowers Game Creation Both Ways',
+      platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 1', date:'2026-06-26', time:'16:00', meetingId:'', email:'' },
+    { name:'Escape Studios', logo:'',
+      speaker:'Niccolò Temperanza',
+      topic:'From Concept to Screen: How Professional Game Artists Work at Escape Studios',
+      platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 1', date:'2026-06-26', time:'17:00', meetingId:'', email:'' },
+    { name:'University of Utah', logo:'',
+      speaker:'Ryan Bown',
+      topic:'10 Questions You Should Ask Before Applying to School',
+      platform:'Voov Meeting', tz:'America/Denver',
+      day:'Day 2', date:'2026-06-27', time:'09:30', meetingId:'', email:'' },
+    { name:'DigiPen Institute of Technology (USA)', logo:'',
+      speaker:'Matt Brunner & Tan Yong Zhen',
+      topic:'From Playing Games to Making Games: Careers in Game Development',
+      platform:'Voov Meeting', tz:'America/Los_Angeles',
+      day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'', email:'' },
+    { name:'DigiPen Institute of Technology (Singapore)', logo:'',
+      speaker:'Matt Brunner & Tan Yong Zhen',
+      topic:'From Playing Games to Making Games: Careers in Game Development',
+      platform:'Voov Meeting', tz:'Asia/Singapore',
+      day:'Day 2', date:'2026-06-27', time:'10:30', meetingId:'', email:'' },
+    { name:'MAGES Institute (Singapore)', logo:'',
+      speaker:'Kingston Chan',
+      topic:'The Value of Entertainment Art: What Skillset Is Needed as an Artist in the Industry',
+      platform:'Voov Meeting', tz:'Asia/Singapore',
+      day:'Day 2', date:'2026-06-27', time:'11:30', meetingId:'', email:'' },
+    { name:'The Glasgow School of Art', logo:'',
+      speaker:'Russell Miller & Daniel Livingstone',
+      topic:'', platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'16:00', meetingId:'', email:'' },
+    { name:'Bournemouth University', logo:'',
+      speaker:'Xiaosong Yang',
+      topic:'AI Reshaping the Creative Future: How Art Students Can Seize the New AI Track in the Media Industry',
+      platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'17:00', meetingId:'', email:'' },
+    { name:'University of Staffordshire', logo:'',
+      speaker:'Chris Headleand',
+      topic:'', platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 2', date:'2026-06-27', time:'18:00', meetingId:'', email:'' },
+    { name:'Gnomon', logo:'',
+      speaker:'Ashley Stegon',
+      topic:'Creature Design Pipeline: Starting the ZBrush Sculpt from a 2D Concept',
+      platform:'Voov Meeting', tz:'America/Los_Angeles',
+      day:'Day 3', date:'2026-06-28', time:'09:30', meetingId:'', email:'' },
+    { name:'Otis College of Art and Design', logo:'',
+      speaker:'Joffery Black & Darren Phillipson',
+      topic:'Game and Entertainment Design Overview',
+      platform:'Voov Meeting', tz:'America/Los_Angeles',
+      day:'Day 3', date:'2026-06-28', time:'10:30', meetingId:'', email:'' },
+    { name:'Teesside University', logo:'',
+      speaker:'Pingyao Sun',
+      topic:"Building a China–UK Creative Industry Talent Bridge: Teesside University's Perspective and Practice",
+      platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'16:00', meetingId:'', email:'' },
+    { name:'Abertay University', logo:'',
+      speaker:'Ruth Falconer & Phillip Vaughan',
+      topic:'Create the Unreal: Next-Level Visual Effects Starts Here...',
+      platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'17:00', meetingId:'', email:'' },
+    { name:'University of Hertfordshire', logo:'',
+      speaker:'David Tree',
+      topic:'', platform:'Voov Meeting', tz:'Europe/London',
+      day:'Day 3', date:'2026-06-28', time:'18:00', meetingId:'', email:'' }
   ];
 
   /* ---------- time zone helpers ---------- */
@@ -361,9 +428,11 @@
     return p.year+'.'+p.month+'.'+p.day+'  '+hh+':'+p.minute;
   }
 
+  function hasSessionTime(inst){ return !!(inst.date && inst.time); }
+
   function sessionInstant(inst){
     var dp = inst.date.split('-'), tp = inst.time.split(':');
-    return wallToInstant(+dp[0],+dp[1],+dp[2],+tp[0],+tp[1],inst.tz);
+    return wallToInstant(+dp[0],+dp[1],+dp[2],+tp[0],+tp[1],'Asia/Shanghai');
   }
 
   /* ---------- populate institution dropdown ---------- */
@@ -392,7 +461,7 @@
     if(!inst){
       var ph = document.createElement('div');
       ph.className = 'ph';
-      ph.textContent = '院校 LOGO';
+      ph.textContent = 'Institution Logo';
       pv.appendChild(ph);
       $('pvTopic').textContent = '';
       $('pvSpeaker').textContent = '';
@@ -404,7 +473,7 @@
       $('pvNotes').innerHTML = '';
       $('pvFooter').textContent = '';
       $('infoPanel').className = 'info-panel empty';
-      $('infoPanel').textContent = '選擇院校後，此處顯示該場次的固定資訊。';
+      $('infoPanel').textContent = 'Session details will appear here once you select your institution.';
       fit();
       return;
     }
@@ -422,36 +491,42 @@
       pv.appendChild(lt);
     }
 
-    $('pvTopic').textContent   = inst.topic;
-    $('pvSpeaker').textContent = inst.speaker;
-    $('pvDay').textContent     = inst.day;
-    $('pvMid').textContent     = inst.meetingId;
+    $('pvTopic').textContent   = inst.topic || TBA;
+    $('pvSpeaker').textContent = inst.speaker || TBA;
+    $('pvDay').textContent     = inst.day || TBA;
+    $('pvMid').textContent     = inst.meetingId || TBA;
 
     // platform (auto-link Voov)
     var platEl = $('pvMplat');
     platEl.innerHTML = '';
-    if(/voov/i.test(inst.platform)){
+    var platform = inst.platform || 'Voov Meeting';
+    if(/voov/i.test(platform)){
       var a = document.createElement('a');
       a.href = 'https://voovmeeting.com/download-center.html';
       a.target = '_blank';
       a.rel = 'noopener';
       a.className = 'plat-link';
-      a.textContent = inst.platform;
+      a.textContent = platform;
       platEl.appendChild(a);
     }else{
-      platEl.textContent = inst.platform;
+      platEl.textContent = platform;
     }
 
     // session time -> institution local + China time
-    var instant = sessionInstant(inst);
-    var off = offsetLabel(instant, inst.tz);
-    $('pvSlocal').textContent = fmtDateTime(instant,inst.tz)+'   '+tzCity(inst.tz)+' Time'+(off?' ('+off+')':'');
-    $('pvScn').textContent = fmtDateTime(instant,'Asia/Shanghai')+'   China Standard Time (UTC+8)';
+    if(hasSessionTime(inst)){
+      var instant = sessionInstant(inst);
+      var off = offsetLabel(instant, inst.tz);
+      $('pvSlocal').textContent = fmtDateTime(instant,inst.tz)+'   '+tzCity(inst.tz)+' Time'+(off?' ('+off+')':'');
+      $('pvScn').textContent = fmtDateTime(instant,'Asia/Shanghai')+'   China Standard Time (UTC+8)';
+    }else{
+      $('pvSlocal').textContent = TBA;
+      $('pvScn').textContent = '';
+    }
 
     // notes
     var ul = $('pvNotes');
     ul.innerHTML = '';
-    (inst.notes||'').split('\n').map(function(s){return s.trim();})
+    (inst.notes || DEFAULT_NOTES).split('\n').map(function(s){return s.trim();})
       .filter(function(s){return s.length;})
       .forEach(function(t){
         var li = document.createElement('li');
@@ -459,8 +534,9 @@
         ul.appendChild(li);
       });
 
-    $('pvFooter').textContent =
-      'For enquiries, please contact the ' + inst.name + ' Admissions Office: ' + inst.email;
+    $('pvFooter').textContent = inst.email
+      ? ('For enquiries, please contact the ' + inst.name + ' Admissions Office: ' + inst.email)
+      : ('For enquiries, please contact the ' + inst.name + ' Admissions Office.');
 
     renderInfoPanel(inst);
     fit();
@@ -472,15 +548,17 @@
     panel.innerHTML = '';
     var title = document.createElement('div');
     title.className = 'ip-title';
-    title.textContent = '本場次資訊（主辦方設定）';
+    title.textContent = 'Session details (set by the organiser)';
     panel.appendChild(title);
-    var instant = sessionInstant(inst);
+    var sessionTxt = hasSessionTime(inst)
+      ? ((inst.day ? inst.day + ' · ' : '') + fmtDateTime(sessionInstant(inst),inst.tz) + ' ' + tzCity(inst.tz))
+      : ((inst.day || 'Day —') + ' · ' + TBA);
     var rows = [
-      ['場次', inst.day + ' · ' + fmtDateTime(instant,inst.tz) + ' ' + tzCity(inst.tz)],
-      ['主題', inst.topic],
-      ['演講者', inst.speaker],
-      ['會議號', inst.meetingId],
-      ['招生辦', inst.email]
+      ['Session', sessionTxt],
+      ['Topic', inst.topic || TBA],
+      ['Speaker', inst.speaker || TBA],
+      ['Meeting ID', inst.meetingId || TBA],
+      ['Admissions', inst.email || TBA]
     ];
     rows.forEach(function(r){
       var row = document.createElement('div');
@@ -507,12 +585,12 @@
 
   /* ---------- download JPEG ---------- */
   $('dlBtn').addEventListener('click', async function(){
-    if(!currentInstitution()){ alert('請先選擇貴院校。'); return; }
-    if(!$('student').value.trim()){ alert('請先輸入學生姓名。'); return; }
+    if(!currentInstitution()){ alert('Please select your institution first.'); return; }
+    if(!$('student').value.trim()){ alert("Please enter the student's name first."); return; }
     var btn = this;
     btn.disabled = true;
     var label = btn.textContent;
-    btn.textContent = '產生中...';
+    btn.textContent = 'Generating...';
     try{
       if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
       var canvas = await html2canvas($('card'), {
@@ -527,7 +605,7 @@
       a.click();
       document.body.removeChild(a);
     }catch(err){
-      alert('產生圖片失敗：' + err.message);
+      alert('Failed to generate image: ' + err.message);
     }finally{
       btn.disabled = false;
       btn.textContent = label;
@@ -536,7 +614,7 @@
 
   /* ---------- print / PDF ---------- */
   $('pdfBtn').addEventListener('click', function(){
-    if(!currentInstitution()){ alert('請先選擇貴院校。'); return; }
+    if(!currentInstitution()){ alert('Please select your institution first.'); return; }
     window.print();
   });
 
